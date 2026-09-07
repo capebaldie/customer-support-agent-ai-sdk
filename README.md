@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Support Agent
 
-## Getting Started
+A RAG-based customer support agent built with the [Vercel AI SDK](https://ai-sdk.dev) and Next.js.
 
-First, run the development server:
+It answers questions about a fictional product — **Meridian Sync**, a managed data-pipeline SaaS — from a knowledge base of support docs in [`content/docs/`](content/docs/). The docs are invented, but they are written like real ones: consistent plan limits, a full error-code reference, and deliberately similar topics that retrieval has to tell apart.
+
+## Stack
+
+| | |
+| --- | --- |
+| Framework | Next.js 16 (App Router) |
+| AI | Vercel AI SDK v7 |
+| Chat model | `gemini-3.5-flash` |
+| Embeddings | `gemini-embedding-001` at 1536 dimensions |
+| Database | Neon Postgres + pgvector |
+| ORM | Drizzle |
+| Styling | Tailwind CSS v4 |
+
+## Setup
+
+**Prerequisites:** Node.js 24+ and pnpm 11+.
+
+**1. Install dependencies**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Configure environment**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Fill in both variables:
 
-## Learn More
+| Variable | Where to get it |
+| --- | --- |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) |
+| `DATABASE_URL` | [Neon console](https://console.neon.tech) — use the **pooled** connection string, the one with `-pooler` in the host |
 
-To learn more about Next.js, take a look at the following resources:
+Both are required. The server validates them at startup and refuses to boot with a message naming what is missing, so you will not spend time debugging a symptom that is really a config problem.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**3. Run**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  api/chat/route.ts    chat endpoint — streaming, agentic tool loop
+  page.tsx             chat UI
+content/docs/          the knowledge base: 15 markdown docs
+lib/
+  env.ts               env var validation (zod)
+instrumentation.ts     runs the env check once, before the server serves
+```
+
+## Environment validation
+
+[`lib/env.ts`](lib/env.ts) parses `process.env` with a zod schema and throws if anything is missing or malformed. [`instrumentation.ts`](instrumentation.ts) imports it from Next's `register` hook, which runs once per server instance and must complete before the server accepts requests.
+
+The effect is that a bad config fails the boot instead of surfacing later as a confusing 500. To add a new required variable, add it to the schema in `lib/env.ts` and to `.env.example`.
+
+## The knowledge base
+
+15 docs, ~2,800 lines, in [`content/docs/`](content/docs/) — onboarding, pricing, billing, account management, auth and SSO, the REST API, error codes, webhooks, connectors, destinations, sync modes, troubleshooting, limits, security, and support.
+
+Each has YAML frontmatter (`title`, `slug`, `category`, `url`, `updated`, `audience`) and consistent `##`/`###` heading structure, which is what the chunker splits on.
+
+Facts are cross-checked for consistency across docs: plan prices, MAR allowances, rate limits, retention windows, and every `SYNC-xxx` error code agree wherever they appear. That matters because it means a wrong answer indicates a retrieval failure, not a contradictory source.
+
+## Status
+
+Built:
+
+- [x] Streaming chat endpoint and UI
+- [x] Knowledge base
+- [x] Environment validation
+
+In progress:
+
+- [ ] Database schema and pgvector setup
+- [ ] Markdown chunker (heading sections, breadcrumb-enriched)
+- [ ] Ingestion script
+- [ ] Retrieval as an agent tool
+- [ ] Citations in the UI
+- [ ] Eval harness — recall@k against hand-written question/source pairs
+
+Deferred until the eval says they are needed: hybrid search, reranking, conversation persistence, auth and account-lookup tools, rate limiting.
