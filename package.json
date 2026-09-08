@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:push": "node --env-file=.env -e \"const{neon}=require('@neondatabase/serverless');neon(process.env.DATABASE_URL).query('CREATE EXTENSION IF NOT EXISTS vector')\" && node --env-file=.env node_modules/drizzle-kit/bin.cjs push",
+    "db:studio": "node --env-file=.env node_modules/drizzle-kit/bin.cjs studio"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.58",
