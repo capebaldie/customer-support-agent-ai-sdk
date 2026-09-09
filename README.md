@@ -41,7 +41,15 @@ Fill in both variables:
 
 Both are required. The server validates them at startup and refuses to boot with a message naming what is missing, so you will not spend time debugging a symptom that is really a config problem.
 
-**3. Run**
+**3. Set up the database**
+
+```bash
+pnpm db:migrate
+```
+
+This applies [`lib/db/migrations/`](lib/db/migrations/) to your Neon database: it enables the `vector` extension, creates the `chunks` table, and builds the HNSW index. No manual SQL in the Neon console is needed.
+
+**4. Run**
 
 ```bash
 pnpm dev
@@ -57,9 +65,34 @@ app/
   page.tsx             chat UI
 content/docs/          the knowledge base: 15 markdown docs
 lib/
+  db/
+    schema.ts          drizzle schema — chunks table, pgvector HNSW index
+    migrations/        generated SQL, applied in order by `pnpm db:migrate`
   env.ts               env var validation (zod)
 instrumentation.ts     runs the env check once, before the server serves
 ```
+
+## Database migrations
+
+Schema changes are versioned as SQL files, not pushed straight at the database:
+
+```bash
+# 1. edit lib/db/schema.ts, then:
+pnpm db:generate --name=what_changed   # write a new .sql file (--name optional)
+# 2. read the generated SQL, commit it, then:
+pnpm db:migrate                        # apply anything not yet applied
+```
+
+Everything under `lib/db/migrations/` is committed — the `.sql` files, the `meta/` snapshots that
+the next diff is computed against, and `_journal.json`. They are how a clone, a CI branch, or a
+rebuilt database gets its schema, so they are never deleted after being applied. Once committed
+they are append-only: drop an unwanted column with a new migration, never by editing an old one.
+
+`pnpm db:studio` opens a browser UI over the data.
+
+There is deliberately no reset script. `DATABASE_URL` points at a real database, and a destructive command sitting one tab-completion away from `db:migrate` is not worth the convenience. To start over, drop the `public` and `drizzle` schemas from the Neon console and re-run `pnpm db:migrate`.
+
+There is deliberately no `db:push`. Push diffs the schema against the live database and applies the change immediately, leaving no file to review and no history to replay, and it resolves a column rename as drop-then-add, which loses the data in it.
 
 ## Environment validation
 
@@ -82,10 +115,10 @@ Built:
 - [x] Streaming chat endpoint and UI
 - [x] Knowledge base
 - [x] Environment validation
+- [x] Database schema and pgvector setup
 
 In progress:
 
-- [ ] Database schema and pgvector setup
 - [ ] Markdown chunker (heading sections, breadcrumb-enriched)
 - [ ] Ingestion script
 - [ ] Retrieval as an agent tool

@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "node --env-file=.env -e \"const{neon}=require('@neondatabase/serverless');neon(process.env.DATABASE_URL).query('CREATE EXTENSION IF NOT EXISTS vector')\" && node --env-file=.env node_modules/drizzle-kit/bin.cjs push",
-    "db:studio": "node --env-file=.env node_modules/drizzle-kit/bin.cjs studio"
+    "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio",
+    "db:migrate": "drizzle-kit migrate",
+    "db:ingest": "node --env-file=.env scripts/ingest.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.58",
