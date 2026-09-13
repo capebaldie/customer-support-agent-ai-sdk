@@ -7,6 +7,7 @@ import {
   unique,
   vector,
 } from "drizzle-orm/pg-core";
+import { EMBEDDING_DIMENSIONS } from "../rag/embedding";
 
 export const chunks = pgTable(
   "chunks",
@@ -26,7 +27,7 @@ export const chunks = pgTable(
     // chunks whose hash moved.
     contentHash: text().notNull(),
     // using dimension as per gemini model
-    embedding: vector({ dimensions: 1536 }).notNull(),
+    embedding: vector({ dimensions: EMBEDDING_DIMENSIONS }).notNull(),
   },
   // table-level extras: indexes and constraints that belong to the table
   // rather than one column. HNSW is pgvector's approximate nearest-neighbour

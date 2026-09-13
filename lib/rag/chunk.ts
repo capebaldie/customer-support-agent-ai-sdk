@@ -14,7 +14,7 @@ export type Chunk = {
 };
 
 // The frontmatter is a YAML block at the top of the markdown file that contains metadata about the document. It is delimited by `---` lines. The body is the rest of the markdown content after the frontmatter.
-const FRONTMATTER = /^---\n([\s\S]*?)\n---\n/;
+const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
 
 // values contain colons (`url: https://...`), so split on the first one only
 function parseFrontmatter(source: string) {
@@ -42,7 +42,7 @@ function splitSections(body: string): Section[] {
   const stack: { level: number; title: string }[] = [];
   let inFence = false;
 
-  for (const line of body.split("\n")) {
+  for (const line of body.split(/\r?\n/)) {
     if (line.startsWith("```")) inFence = !inFence;
 
     const heading = inFence ? null : /^(#{2,3}) +(.*)$/.exec(line);
@@ -77,6 +77,8 @@ function splitSections(body: string): Section[] {
  * Sections are not split further and small ones are not merged: the largest
  * here is ~470 tokens, and a 26-token section that answers one question
  * precisely retrieves better alone than blurred into its neighbour.
+ *
+ * @param source the full text of one markdown doc, including its frontmatter
  */
 export function chunkMarkdown(source: string): Chunk[] {
   const { meta, body } = parseFrontmatter(source);
