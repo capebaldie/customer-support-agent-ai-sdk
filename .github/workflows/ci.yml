@@ -9,9 +9,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     env:
-      # next build imports lib/env.ts while prerendering; dummy values satisfy it
+      # next build imports lib/env.ts while prerendering; dummy values satisfy it.
+      # DATABASE_URL must be well-formed: neon() parses it when lib/db loads (never connects here)
       GOOGLE_GENERATIVE_AI_API_KEY: ci
-      DATABASE_URL: postgres://ci
+      DATABASE_URL: postgres://ci:ci@ci.invalid/ci
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
