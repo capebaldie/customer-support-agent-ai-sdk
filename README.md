@@ -6,15 +6,15 @@ It answers questions about a fictional product — **Meridian Sync**, a managed 
 
 ## Stack
 
-| | |
-| --- | --- |
-| Framework | Next.js 16 (App Router) |
-| AI | Vercel AI SDK v7 |
-| Chat model | `gemini-3.5-flash` |
+|            |                                           |
+| ---------- | ----------------------------------------- |
+| Framework  | Next.js 16 (App Router)                   |
+| AI         | Vercel AI SDK v7                          |
+| Chat model | `gemini-3.5-flash`                        |
 | Embeddings | `gemini-embedding-001` at 1536 dimensions |
-| Database | Neon Postgres + pgvector |
-| ORM | Drizzle |
-| Styling | Tailwind CSS v4 |
+| Database   | Neon Postgres + pgvector                  |
+| ORM        | Drizzle                                   |
+| Styling    | Tailwind CSS v4                           |
 
 ## Setup
 
@@ -34,10 +34,10 @@ cp .env.example .env
 
 Fill in both variables:
 
-| Variable | Where to get it |
-| --- | --- |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) |
-| `DATABASE_URL` | [Neon console](https://console.neon.tech) — use the **pooled** connection string, the one with `-pooler` in the host |
+| Variable                       | Where to get it                                                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey)                                                               |
+| `DATABASE_URL`                 | [Neon console](https://console.neon.tech) — use the **pooled** connection string, the one with `-pooler` in the host |
 
 Both are required. The server validates them at startup and refuses to boot with a message naming what is missing, so you will not spend time debugging a symptom that is really a config problem.
 
@@ -49,7 +49,15 @@ pnpm db:migrate
 
 This applies [`lib/db/migrations/`](lib/db/migrations/) to your Neon database: it enables the `vector` extension, creates the `chunks` table, and builds the HNSW index. No manual SQL in the Neon console is needed.
 
-**4. Run**
+**4. Ingest the knowledge base**
+
+```bash
+pnpm db:ingest
+```
+
+Chunks every doc in [`content/docs/`](content/docs/), embeds it, and writes it to the `chunks` table — 237 chunks, about two minutes on a free Gemini key. Without this the schema exists but there is nothing to retrieve.
+
+**5. Run**
 
 ```bash
 pnpm dev
@@ -68,7 +76,12 @@ lib/
   db/
     schema.ts          drizzle schema — chunks table, pgvector HNSW index
     migrations/        generated SQL, applied in order by `pnpm db:migrate`
+  rag/
+    chunk.ts           splits docs into heading sections with breadcrumbs
+    chunk.test.ts      node --test lib/rag/chunk.test.ts
   env.ts               env var validation (zod)
+scripts/
+  ingest.ts            chunk + embed + upsert, run by `pnpm db:ingest`
 instrumentation.ts     runs the env check once, before the server serves
 ```
 
@@ -94,6 +107,39 @@ There is deliberately no reset script. `DATABASE_URL` points at a real database,
 
 There is deliberately no `db:push`. Push diffs the schema against the live database and applies the change immediately, leaving no file to review and no history to replay, and it resolves a column rename as drop-then-add, which loses the data in it.
 
+## Ingesting the knowledge base
+
+```bash
+pnpm db:ingest            # only what changed
+pnpm db:ingest --force    # re-embed everything
+```
+
+A run is a diff, not a rebuild. Every chunk is identified by `(docSlug, headingPath)` and hashed
+over the exact text that gets embedded, so the script compares the corpus on disk against the rows
+in the database and touches only the difference:
+
+| Change                 | Result                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| Edit a section's prose | that one chunk is re-embedded and updated in place                             |
+| Add or remove a doc    | its chunks are inserted or deleted                                             |
+| Rename a heading       | the chunks beneath it get new identities — old rows deleted, new ones inserted |
+| No change              | `nothing to do`, and no embedding calls                                        |
+
+Re-running after a typo fix therefore costs one API call rather than 237, and the index is never
+emptied mid-run. Each batch is written as it completes, so an interrupted run resumes where it
+stopped rather than starting over.
+
+The hash covers the heading breadcrumb as well as the body, because the breadcrumb is embedded with
+it. Renaming a heading changes the vector even when the prose beneath is untouched.
+
+Embedding happens in slices of 100 a minute apart: Gemini's free tier allows 100 `embed_content`
+requests per minute and counts each value, not each HTTP call, so a single batched request for 237
+chunks is rejected. `RATE_LIMIT` at the top of [`scripts/ingest.ts`](scripts/ingest.ts) is the only
+thing to raise on a paid key.
+
+Use `--force` when the embedding model or `outputDimensionality` changes — the stored vectors are
+then stale in a way no hash can detect, since the input text never moved.
+
 ## Environment validation
 
 [`lib/env.ts`](lib/env.ts) parses `process.env` with a zod schema and throws if anything is missing or malformed. [`instrumentation.ts`](instrumentation.ts) imports it from Next's `register` hook, which runs once per server instance and must complete before the server accepts requests.
@@ -107,22 +153,3 @@ The effect is that a bad config fails the boot instead of surfacing later as a c
 Each has YAML frontmatter (`title`, `slug`, `category`, `url`, `updated`, `audience`) and consistent `##`/`###` heading structure, which is what the chunker splits on.
 
 Facts are cross-checked for consistency across docs: plan prices, MAR allowances, rate limits, retention windows, and every `SYNC-xxx` error code agree wherever they appear. That matters because it means a wrong answer indicates a retrieval failure, not a contradictory source.
-
-## Status
-
-Built:
-
-- [x] Streaming chat endpoint and UI
-- [x] Knowledge base
-- [x] Environment validation
-- [x] Database schema and pgvector setup
-
-In progress:
-
-- [ ] Markdown chunker (heading sections, breadcrumb-enriched)
-- [ ] Ingestion script
-- [ ] Retrieval as an agent tool
-- [ ] Citations in the UI
-- [ ] Eval harness — recall@k against hand-written question/source pairs
-
-Deferred until the eval says they are needed: hybrid search, reranking, conversation persistence, auth and account-lookup tools, rate limiting.

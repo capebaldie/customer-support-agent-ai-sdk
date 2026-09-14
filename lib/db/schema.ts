@@ -7,7 +7,7 @@ import {
   unique,
   vector,
 } from "drizzle-orm/pg-core";
-import { EMBEDDING_DIMENSIONS } from "../rag/embedding";
+import { EMBEDDING_DIMENSIONS } from "../rag/embedding.ts";
 
 export const chunks = pgTable(
   "chunks",
