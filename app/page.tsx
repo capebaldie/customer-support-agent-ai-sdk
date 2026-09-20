@@ -27,6 +27,17 @@ export default function Chat() {
   const { messages, sendMessage, status, error } = useChat();
   // "error" stays enabled so the user can retry; otherwise the form would lock after one failure
   const busy = status === "submitted" || status === "streaming";
+  const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
+
+  function sendFeedback(messageId: string, value: "up" | "down") {
+    setFeedback((f) => ({ ...f, [messageId]: value }));
+    // fire-and-forget: a lost vote is not worth an error in the chat
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ messageId, feedback: value }),
+    }).catch(() => {});
+  }
 
   return (
     <div className="flex flex-col w-full max-w-2xl px-4 py-24 mx-auto gap-6">
@@ -117,6 +128,25 @@ export default function Chat() {
                 ))}
               </ul>
             )}
+
+            {/* only answers that searched have log rows to attach feedback to */}
+            {searchOutputs(message).length > 0 &&
+              !(busy && message.id === messages.at(-1)?.id) && (
+                <div className="mt-2 flex gap-1 text-sm">
+                  {(["up", "down"] as const).map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-label={value === "up" ? "Helpful" : "Not helpful"}
+                      aria-pressed={feedback[message.id] === value}
+                      onClick={() => sendFeedback(message.id, value)}
+                      className="rounded px-2 py-0.5 border border-zinc-200 dark:border-zinc-800 aria-pressed:bg-zinc-200 dark:aria-pressed:bg-zinc-700"
+                    >
+                      {value === "up" ? "👍" : "👎"}
+                    </button>
+                  ))}
+                </div>
+              )}
           </div>
         );
       })}

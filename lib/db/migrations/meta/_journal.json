@@ -15,6 +15,13 @@
       "when": 1788950890888,
       "tag": "0001_overrated_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789490881206,
+      "tag": "0002_lonely_tenebrous",
+      "breakpoints": true
     }
   ]
 }

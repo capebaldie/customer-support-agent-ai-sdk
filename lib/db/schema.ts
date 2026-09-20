@@ -1,12 +1,17 @@
 import {
+  check,
   date,
   index,
+  integer,
   pgTable,
+  real,
   serial,
   text,
+  timestamp,
   unique,
   vector,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { EMBEDDING_DIMENSIONS } from "../rag/embedding.ts";
 
 export const chunks = pgTable(
@@ -43,5 +48,35 @@ export const chunks = pgTable(
     // upserts on. `id` is a surrogate key — it changes on every reinsert,
     // so it cannot be what a diff matches against.
     unique("chunks_ident").on(table.docSlug, table.headingPath),
+  ],
+);
+
+// one row per searchKnowledgeBase call — what the model searched for and exactly what came back
+export const retrievals = pgTable(
+  "retrievals",
+  {
+    id: serial().primaryKey(),
+    // the assistant message id the client sees; several searches in one answer share it, and
+    // feedback is written against it
+    messageId: text().notNull(),
+    query: text().notNull(),
+    // no foreign key: ingest deletes chunks whose heading was renamed, and the log must outlive them.
+    // An id that no longer joins means the doc changed after this answer.
+    chunkIds: integer().array().notNull(),
+    scores: real().array().notNull(),
+    k: integer().notNull(),
+    latencyMs: integer().notNull(),
+    model: text().notNull(),
+    // whole-answer totals, repeated on each search row of that answer; null when generation failed
+    inputTokens: integer(),
+    outputTokens: integer(),
+    feedback: text({ enum: ["up", "down"] }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("retrievals_message_idx").on(table.messageId),
+    index("retrievals_created_idx").on(table.createdAt),
+    // text({ enum }) only narrows the TypeScript type; this is what stops a bad value in the table
+    check("retrievals_feedback", sql`${table.feedback} in ('up', 'down')`),
   ],
 );

@@ -140,6 +140,51 @@ thing to raise on a paid key.
 Use `--force` when the embedding model or `outputDimensionality` changes — the stored vectors are
 then stale in a way no hash can detect, since the input text never moved.
 
+## Retrieval log
+
+Every `searchKnowledgeBase` call writes a row to `retrievals`: the query, the chunk ids and scores it
+returned, `k`, latency, model, and the answer's token counts. The row is written with Next's
+`after()`, once the response has finished streaming, so logging never slows or breaks an answer.
+The 👍/👎 under an answer sets `feedback` on every search row of that message.
+
+Thumbs-down answers with what they retrieved, newest first (Neon SQL editor or `psql`):
+
+```sql
+select r."createdAt", r.query, r.scores,
+       array_agg(coalesce(c."docSlug" || ' > ' || c."headingPath", '(chunk ' || ids.id || ' since deleted)')
+                 order by ids.ord) as retrieved
+from retrievals r
+cross join lateral unnest(r."chunkIds") with ordinality as ids(id, ord)
+left join chunks c on c.id = ids.id
+where r.feedback = 'down'
+group by r.id
+order by r."createdAt" desc;
+```
+
+Each of these is a candidate question for `eval/questions.ts`.
+
+### Retention
+
+Rows are user text and grow without bound, so unrated rows are dropped after 30 days. Rows with
+feedback are kept: they are the eval set's source of new questions, and there are few of them.
+Complaints arrive within days of an answer, so a longer window would store rows nobody opens.
+
+```sql
+delete from retrievals where "createdAt" < now() - interval '30 days' and feedback is null;
+```
+
+Schedule it once per deployment, in the Neon SQL editor:
+
+```sql
+create extension if not exists pg_cron;
+select cron.schedule('retrievals-retention', '17 3 * * *',
+  $$delete from retrievals where "createdAt" < now() - interval '30 days' and feedback is null$$);
+```
+
+`select * from cron.job;` lists it, `select cron.unschedule('retrievals-retention');` removes it.
+Not in a migration: `pg_cron` jobs live in the database, not the schema, and every branch created
+from production would otherwise inherit a job deleting rows on a copy nobody reads.
+
 ## Environment validation
 
 [`lib/env.ts`](lib/env.ts) parses `process.env` with a zod schema and throws if anything is missing or malformed. [`instrumentation.ts`](instrumentation.ts) imports it from Next's `register` hook, which runs once per server instance and must complete before the server accepts requests.

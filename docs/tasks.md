@@ -382,7 +382,7 @@ A PR that renames a heading in `content/docs/` gets a comment with its retrieval
 
 ---
 
-## Task 10 — Retrieval logging
+## Task 10 — Retrieval logging — DONE
 
 **Files:** `lib/db/schema.ts`, `app/api/chat/route.ts`
 
@@ -390,14 +390,35 @@ The only debugging surface this system has, and the pipeline that grows the eval
 
 ### Steps
 
-- [ ] One `retrievals` table: query, retrieved chunk ids, scores, `k`, latency, model, token counts, timestamp
-- [ ] Write a row from the route after each tool call. Do not block the stream on it.
-- [ ] A nullable `feedback` column, written by a thumbs up/down in the UI
-- [ ] One query that lists thumbs-down rows with what was retrieved
+- [x] One `retrievals` table: query, retrieved chunk ids, scores, `k`, latency, model, token counts, timestamp
+- [x] Write a row from the route after each tool call. Do not block the stream on it.
+- [x] A nullable `feedback` column, written by a thumbs up/down in the UI
+- [x] One query that lists thumbs-down rows with what was retrieved
 
 ### Done when
 
 For any answer a user complains about, you can see the exact chunks and scores that produced it.
+
+### Outcome
+
+`retrievals` — one row per `searchKnowledgeBase` call, written from `after()` once the response has
+finished streaming. Verified against the live database: a 👎 in the UI sets `feedback` on every row
+of that answer, and the README query lists it with the sections it retrieved.
+
+- **Token counts are per answer, not per search.** The SDK aggregates usage over the whole tool
+  loop, so an answer with two searches repeats the same totals on both rows.
+- **A declined question logs nothing.** The model refuses off-topic questions without calling the
+  tool, so there is no search to record. Questions that are searched and escalate are logged
+  normally, with their low scores. Catching wrong refusals needs per-turn logging, which is a
+  different table and a different purpose.
+- **Retention is 30 days for unrated rows**, rated ones kept. `pg_cron` schedule in the README,
+  deliberately not in a migration: jobs live in the database, and every Neon branch off production
+  would otherwise inherit a job deleting rows on a copy nobody reads.
+- **Sampling was considered and rejected** (log a fraction, or buffer in Redis and persist only on
+  👎). Feedback is rare, so a feedback-only table keeps a few percent of the evidence and loses the
+  denominator every rate question needs; a TTL races the user who rates an answer an hour later. At
+  ~400 bytes a row the current volume is not worth a second store. If it ever is, sample at write
+  time — keep every low-scoring or escalated row plus a recorded fraction of the rest.
 
 ### Gotchas
 
