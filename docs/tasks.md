@@ -427,7 +427,7 @@ of that answer, and the README query lists it with the sections it retrieved.
 
 ---
 
-## Task 11 — Hybrid search
+## Task 11 — Hybrid search — TRIED AND REVERTED
 
 **File:** `lib/rag/search.ts`
 
@@ -435,18 +435,69 @@ Only now, with a baseline to measure against.
 
 ### Steps
 
-- [ ] A generated `tsvector` column over `embeddingInput`, plus a GIN index
-- [ ] Run both legs, fuse with reciprocal rank fusion, rerank the union to `k`
-- [ ] Re-run the eval. **Keep it only if the number moves.** Targets from Task 8's baseline: *"why did my sync fail with 401"* (`SYNC-101` at rank 3 behind `SYNC-401`), and whether better ranking opens a gap between in-scope and out-of-scope top similarity for `MIN_SIMILARITY`.
+- [x] A generated `tsvector` column over `embeddingInput`, plus a GIN index
+- [x] Run both legs, fuse with reciprocal rank fusion, rerank the union to `k`
+- [x] Re-run the eval. **Keep it only if the number moves.** Targets from Task 8's baseline: *"why did my sync fail with 401"* (`SYNC-101` at rank 3 behind `SYNC-401`), and whether better ranking opens a gap between in-scope and out-of-scope top similarity for `MIN_SIMILARITY`.
 
 ### Done when
 
 `eval/baseline.json` improves, or this task is reverted and the reason recorded.
 
-### Gotchas
+### Outcome
 
-- Embeddings are weak on exact tokens — `SYNC-101`, `mk_test_`, `429`, plan names — which is exactly what support users paste. This is the most likely single-largest recall win available, and it costs one index.
-- Fuse by rank, not by raw score. Cosine similarity and `ts_rank` are not on the same scale and averaging them is meaningless.
+Built, measured, reverted. It loses recall on this corpus.
+
+| Run | recall@1 | recall@5 | MRR |
+| --- | --- | --- | --- |
+| Vector only (baseline) | **0.912** | 1.0 | **0.946** |
+| RRF, equal weight | 0.824 | 1.0 | 0.900 |
+| RRF, lexical weight 0.4 / 0.2 | 0.853 | 1.0 | 0.914 |
+| RRF 1.0 / 0.4, hyphens and underscores normalised | 0.824 / 0.853 | 1.0 | 0.900 / 0.914 |
+
+The lexical leg promoted keyword coincidences over a vector leg that was already right: *"connect
+database behind firewall ssh tunnel"* fell to the getting-started IP-allowlisting section, *"can we
+keep data in the EU"* to GDPR instead of Data residency. Two questions improved, four to six
+regressed. Lowering the weight converged back toward vector-only without ever beating it — at which
+point the leg is doing nothing and costs a column, an index and a join.
+
+**The premise did not survive contact with the tokenizer.** `SYNC-401` indexes as `'sync' '-401'`,
+while a user typing bare `401` produces `'401'` — different lexemes, no match. That is why *"why did
+my sync fail with 401"* got *worse* (rank 3 → 4): full-text matched the API doc's `401 —
+Authentication` section, not the sync error code. Stripping `-` and `_` on both sides made the
+tokens line up and changed nothing in the scores.
+
+Reverted. Schema and search are back to vector-only and `eval/baseline.json` is unchanged at
+0.912 / 1.0 / 0.946. The three migrations the attempt generated (add the column, normalise it, drop
+it again) were deleted rather than committed: they net out to nothing, and every clone and CI branch
+would have replayed them. This section is the record instead. To redo it: a generated
+`to_tsvector('english', "docTitle" || ' ' || "headingPath" || ' ' || content)` column with a GIN
+index, and two CTEs fused by `1/(60 + rank)`.
+
+**What this says about the remaining recall@1 misses.** They are not exact-token failures. Three of
+the four are two sections that both legitimately answer the question (overage vs the MAR
+definition), which is a precision-at-1 problem, not a recall one — the deferred reranking note is
+the next thing to try, and the eval is set up to judge it. The escalation threshold is unchanged:
+in-scope and out-of-scope top similarities still overlap at 0.63/0.659.
+
+### Gotchas found
+
+- **`ts_rank` is not the problem; tokenization is.** Check what `to_tsvector` and
+  `websearch_to_tsquery` actually produce for your identifiers before assuming full-text helps with
+  them. One `select to_tsvector('english', 'SYNC-401 …')` would have predicted this result.
+- **drizzle-kit drops and re-adds a generated column when its expression changes, and does not
+  recreate indexes on it.** Changing the column's expression silently left its GIN index gone, and
+  the next generated migration then tried to `DROP INDEX` something that no longer existed. Read
+  generated SQL for generated columns; add the `CREATE INDEX` back by hand.
+- Bind a fusion weight with `sql.raw`, not as a parameter: Postgres typed `0.4` as an integer and
+  `pg_strtoint64_safe` failed the whole query.
+
+### Gotchas as written before the attempt
+
+- ~~Embeddings are weak on exact tokens — `SYNC-101`, `mk_test_`, `429`, plan names — which is
+  exactly what support users paste. This is the most likely single-largest recall win available, and
+  it costs one index.~~ **Wrong.** The premise was plausible and the measurement disagreed; see the
+  outcome above. This is what the eval is for.
+- Fuse by rank, not by raw score. Cosine similarity and `ts_rank` are not on the same scale and averaging them is meaningless. **Still true** — the attempt did fuse by rank.
 
 ---
 
