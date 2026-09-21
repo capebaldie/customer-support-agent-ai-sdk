@@ -514,6 +514,15 @@ Each of these waits for the eval number to justify it, or for a real user to ask
   see that "google sheets" is absent from the Supported destinations list; a bi-encoder compresses
   each side to its own vector first and structurally cannot. Measure it on that gap — lowest correct
   top-1 versus highest out-of-scope — not on recall@1, which has almost no headroom left.
+- **Partial answers to multi-part questions.** A two-part question where one part is uncovered
+  escalates neither part. The covered half pulls the blended query above `MIN_SIMILARITY` —
+  `"mobile app iphone"` alone scores 0.555, `"free trial mobile app iphone"` scores 0.623 — so the
+  tool returns `escalate: false` and the model answers half the question without signalling the
+  other half went unanswered. Incomplete, not wrong: nothing is fabricated, because the
+  answer-only-from-sections rule still holds. Fixing it means making escalation per-part in
+  `INSTRUCTIONS`, which invalidates every capture in `eval/search-queries.json` and costs two days
+  against the 20/day free-tier cap. Wait for a thumbs-down that shows it happening. The both-halves-
+  covered case already works and `scripts/check-multipart.ts` guards it.
 - **Conversation persistence.**
 - **Better Auth + account-lookup tools.** When built: the user id comes from the **server session**, never as a tool parameter — a model-supplied `userId` is an attacker-influenced input and turns into a data-exfiltration path.
 - **Rate limiting.**
