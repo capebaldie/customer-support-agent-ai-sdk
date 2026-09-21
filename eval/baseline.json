@@ -1,360 +1,721 @@
 {
   "k": 5,
-  "n": 34,
-  "recallAt1": 0.912,
-  "recallAt5": 1,
-  "mrr": 0.946,
-  "topSimilarity": {
-    "correctAt1": [
-      0.63,
-      0.659,
-      0.667,
-      0.687,
-      0.696,
-      0.702,
-      0.705,
-      0.706,
-      0.707,
-      0.709,
-      0.71,
-      0.712,
-      0.72,
-      0.721,
-      0.726,
-      0.729,
-      0.729,
-      0.73,
-      0.735,
-      0.742,
-      0.744,
-      0.749,
-      0.749,
-      0.764,
-      0.767,
-      0.769,
-      0.771,
-      0.775,
-      0.779,
-      0.787,
-      0.809
-    ],
-    "incorrectAt1": [
-      0.704,
-      0.712,
-      0.794
-    ],
-    "outOfScope": [
-      0.494,
-      0.554,
-      0.615,
-      0.633,
-      0.659
-    ]
+  "coverage": "38/39 questions captured by scripts/rephrase.ts",
+  "raw": {
+    "n": 34,
+    "recallAt1": 0.912,
+    "recallAt5": 1,
+    "mrr": 0.946,
+    "topSimilarity": {
+      "correctAt1": [
+        0.63,
+        0.659,
+        0.667,
+        0.687,
+        0.696,
+        0.702,
+        0.705,
+        0.706,
+        0.707,
+        0.709,
+        0.71,
+        0.712,
+        0.72,
+        0.721,
+        0.726,
+        0.729,
+        0.729,
+        0.73,
+        0.735,
+        0.742,
+        0.744,
+        0.749,
+        0.749,
+        0.764,
+        0.767,
+        0.769,
+        0.771,
+        0.775,
+        0.779,
+        0.787,
+        0.809
+      ],
+      "incorrectAt1": [
+        0.704,
+        0.712,
+        0.794
+      ],
+      "outOfScope": [
+        0.554,
+        0.615,
+        0.633,
+        0.659
+      ]
+    }
+  },
+  "rephrased": {
+    "n": 34,
+    "recallAt1": 0.912,
+    "recallAt5": 1,
+    "mrr": 0.956,
+    "topSimilarity": {
+      "correctAt1": [
+        0.638,
+        0.651,
+        0.687,
+        0.689,
+        0.69,
+        0.691,
+        0.691,
+        0.691,
+        0.694,
+        0.706,
+        0.712,
+        0.712,
+        0.714,
+        0.718,
+        0.72,
+        0.723,
+        0.728,
+        0.735,
+        0.741,
+        0.744,
+        0.744,
+        0.757,
+        0.757,
+        0.759,
+        0.76,
+        0.776,
+        0.778,
+        0.779,
+        0.787,
+        0.797,
+        0.82
+      ],
+      "incorrectAt1": [
+        0.676,
+        0.746,
+        0.774
+      ],
+      "outOfScope": [
+        0.555,
+        0.566,
+        0.7,
+        0.714
+      ]
+    }
   },
   "results": [
     {
       "question": "why did my sync fail with 401",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-101",
-      "rank": 3,
-      "topSimilarity": 0.794,
-      "top": "troubleshooting-sync-failures > Limit errors — SYNC-4xx > SYNC-401 — MAR limit reached"
+      "searchQuery": "401 sync failed unauthorized error",
+      "raw": {
+        "rank": 3,
+        "topSimilarity": 0.794,
+        "top": "troubleshooting-sync-failures > Limit errors — SYNC-4xx > SYNC-401 — MAR limit reached"
+      },
+      "rephrased": {
+        "rank": 2,
+        "topSimilarity": 0.746,
+        "top": "troubleshooting-sync-failures > Limit errors — SYNC-4xx > SYNC-401 — MAR limit reached"
+      }
     },
     {
       "question": "SYNC-101 postgres password rotated",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-101",
-      "rank": 1,
-      "topSimilarity": 0.72,
-      "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-101 — Source authentication failed"
+      "searchQuery": "SYNC-101 postgres password rotated",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.72,
+        "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-101 — Source authentication failed"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.72,
+        "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-101 — Source authentication failed"
+      }
     },
     {
       "question": "snowflake login failing sync error destination auth",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-201",
-      "rank": 1,
-      "topSimilarity": 0.769,
-      "top": "troubleshooting-sync-failures > Destination errors — SYNC-2xx > SYNC-201 — Destination authentication failed"
+      "searchQuery": "Snowflake destination auth login failing sync error",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.769,
+        "top": "troubleshooting-sync-failures > Destination errors — SYNC-2xx > SYNC-201 — Destination authentication failed"
+      },
+      "rephrased": {
+        "rank": 2,
+        "topSimilarity": 0.774,
+        "top": "destinations > Snowflake > Network policies"
+      }
     },
     {
       "question": "SYNC-201 bigquery service account key deleted",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-201",
-      "rank": 1,
-      "topSimilarity": 0.706,
-      "top": "troubleshooting-sync-failures > Destination errors — SYNC-2xx > SYNC-201 — Destination authentication failed"
+      "searchQuery": "SYNC-201 bigquery service account key deleted",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.706,
+        "top": "troubleshooting-sync-failures > Destination errors — SYNC-2xx > SYNC-201 — Destination authentication failed"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.706,
+        "top": "troubleshooting-sync-failures > Destination errors — SYNC-2xx > SYNC-201 — Destination authentication failed"
+      }
     },
     {
       "question": "api returns 429 too many requests how long do i wait",
       "expectedSlug": "api-error-codes",
       "expectedHeading": "rate_limit_exceeded",
-      "rank": 1,
-      "topSimilarity": 0.73,
-      "top": "api-error-codes > 429 — Rate limiting > rate_limit_exceeded"
+      "searchQuery": "429 too many requests rate limit wait time",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.73,
+        "top": "api-error-codes > 429 — Rate limiting > rate_limit_exceeded"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.728,
+        "top": "api-error-codes > 429 — Rate limiting > rate_limit_exceeded"
+      }
     },
     {
       "question": "salesforce api quota hit sync keeps getting throttled",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-103",
-      "rank": 1,
-      "topSimilarity": 0.726,
-      "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-103 — Source rate limited"
+      "searchQuery": "salesforce api quota throttle limits",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.726,
+        "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-103 — Source rate limited"
+      },
+      "rephrased": {
+        "rank": 2,
+        "topSimilarity": 0.676,
+        "top": "limits-and-quotas > API rate limits"
+      }
     },
     {
       "question": "meridian 409 schema locked",
       "expectedSlug": "api-error-codes",
       "expectedHeading": "schema_locked",
-      "rank": 1,
-      "topSimilarity": 0.705,
-      "top": "api-error-codes > 409 — Conflict > schema_locked"
+      "searchQuery": "409 schema locked",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.705,
+        "top": "api-error-codes > 409 — Conflict > schema_locked"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.82,
+        "top": "api-error-codes > 409 — Conflict > schema_locked"
+      }
     },
     {
       "question": "api key expired error",
       "expectedSlug": "api-error-codes",
       "expectedHeading": "expired_api_key",
-      "rank": 1,
-      "topSimilarity": 0.779,
-      "top": "api-error-codes > 401 — Authentication > expired_api_key"
+      "searchQuery": "api key expired error",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.779,
+        "top": "api-error-codes > 401 — Authentication > expired_api_key"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.779,
+        "top": "api-error-codes > 401 — Authentication > expired_api_key"
+      }
     },
     {
       "question": "replication slot missing postgres cdc",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-104",
-      "rank": 1,
-      "topSimilarity": 0.744,
-      "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-104 — Replication slot missing"
+      "searchQuery": "replication slot missing postgres cdc",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.744,
+        "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-104 — Replication slot missing"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.744,
+        "top": "troubleshooting-sync-failures > Source errors — SYNC-1xx > SYNC-104 — Replication slot missing"
+      }
     },
     {
       "question": "hit my MAR limit syncs stopped",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "SYNC-401",
-      "rank": 1,
-      "topSimilarity": 0.809,
-      "top": "troubleshooting-sync-failures > Limit errors — SYNC-4xx > SYNC-401 — MAR limit reached"
+      "searchQuery": "MAR limit syncs stopped",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.809,
+        "top": "troubleshooting-sync-failures > Limit errors — SYNC-4xx > SYNC-401 — MAR limit reached"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.797,
+        "top": "troubleshooting-sync-failures > Limit errors — SYNC-4xx > SYNC-401 — MAR limit reached"
+      }
     },
     {
       "question": "duplicate rows showing up in warehouse",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "Duplicate rows",
-      "rank": 3,
-      "topSimilarity": 0.712,
-      "top": "troubleshooting-sync-failures > Problems with no error code > Rows appear then disappear"
+      "searchQuery": "duplicate rows warehouse",
+      "raw": {
+        "rank": 3,
+        "topSimilarity": 0.712,
+        "top": "troubleshooting-sync-failures > Problems with no error code > Rows appear then disappear"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.691,
+        "top": "troubleshooting-sync-failures > Problems with no error code > Duplicate rows in the destination"
+      }
     },
     {
       "question": "sync says success but some rows are missing",
       "expectedSlug": "troubleshooting-sync-failures",
       "expectedHeading": "data is missing",
-      "rank": 1,
-      "topSimilarity": 0.771,
-      "top": "troubleshooting-sync-failures > Problems with no error code > The sync succeeds but data is missing"
+      "searchQuery": "sync success missing rows",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.771,
+        "top": "troubleshooting-sync-failures > Problems with no error code > The sync succeeds but data is missing"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.757,
+        "top": "troubleshooting-sync-failures > Problems with no error code > The sync succeeds but data is missing"
+      }
     },
     {
       "question": "what counts as a monthly active row",
       "expectedSlug": "plans-and-pricing",
-      "rank": 1,
-      "topSimilarity": 0.775,
-      "top": "plans-and-pricing > What a Monthly Active Row is > Worked example"
+      "searchQuery": "monthly active row",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.775,
+        "top": "plans-and-pricing > What a Monthly Active Row is > Worked example"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.757,
+        "top": "plans-and-pricing > What a Monthly Active Row is"
+      }
     },
     {
       "question": "how much do you charge if we go over our rows",
       "expectedSlug": "plans-and-pricing",
       "expectedHeading": "Overage",
-      "rank": 2,
-      "topSimilarity": 0.704,
-      "top": "plans-and-pricing > What a Monthly Active Row is"
+      "searchQuery": "overage charges row limit pricing",
+      "raw": {
+        "rank": 2,
+        "topSimilarity": 0.704,
+        "top": "plans-and-pricing > What a Monthly Active Row is"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.718,
+        "top": "plans-and-pricing > Overage billing"
+      }
     },
     {
       "question": "is there a free trial",
       "expectedSlug": "plans-and-pricing",
       "expectedHeading": "Free trial",
-      "rank": 1,
-      "topSimilarity": 0.696,
-      "top": "plans-and-pricing > Free trial"
+      "searchQuery": "free trial",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.696,
+        "top": "plans-and-pricing > Free trial"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.689,
+        "top": "plans-and-pricing > Free trial"
+      }
     },
     {
       "question": "discount for nonprofits?",
       "expectedSlug": "plans-and-pricing",
-      "rank": 1,
-      "topSimilarity": 0.749,
-      "top": "plans-and-pricing > Nonprofit and startup discounts"
+      "searchQuery": "nonprofit discount",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.749,
+        "top": "plans-and-pricing > Nonprofit and startup discounts"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.714,
+        "top": "plans-and-pricing > Nonprofit and startup discounts"
+      }
     },
     {
       "question": "card declined what happens to my account",
       "expectedSlug": "billing-and-invoices",
       "expectedHeading": "Failed payments",
-      "rank": 1,
-      "topSimilarity": 0.63,
-      "top": "billing-and-invoices > Failed payments and dunning"
+      "searchQuery": "card declined account status billing failed",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.63,
+        "top": "billing-and-invoices > Failed payments and dunning"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.638,
+        "top": "billing-and-invoices > Failed payments and dunning"
+      }
     },
     {
       "question": "can I get a refund",
       "expectedSlug": "billing-and-invoices",
       "expectedHeading": "Refunds",
-      "rank": 1,
-      "topSimilarity": 0.659,
-      "top": "billing-and-invoices > Refunds and credits"
+      "searchQuery": "refund policy refund",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.659,
+        "top": "billing-and-invoices > Refunds and credits"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.651,
+        "top": "billing-and-invoices > Refunds and credits"
+      }
     },
     {
       "question": "how do i set up okta saml",
       "expectedSlug": "authentication-and-sso",
       "expectedHeading": "SAML",
-      "rank": 1,
-      "topSimilarity": 0.687,
-      "top": "authentication-and-sso > SAML 2.0 single sign-on"
+      "searchQuery": "Okta SAML setup",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.687,
+        "top": "authentication-and-sso > SAML 2.0 single sign-on"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.687,
+        "top": "authentication-and-sso > SAML 2.0 single sign-on"
+      }
     },
     {
       "question": "lost my phone cant do 2fa",
       "expectedSlug": "authentication-and-sso",
       "expectedHeading": "Locked out of MFA",
-      "rank": 1,
-      "topSimilarity": 0.667,
-      "top": "authentication-and-sso > Multi-factor authentication > Locked out of MFA"
+      "searchQuery": "lost phone 2fa reset two factor authentication",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.667,
+        "top": "authentication-and-sso > Multi-factor authentication > Locked out of MFA"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.691,
+        "top": "authentication-and-sso > Multi-factor authentication > Locked out of MFA"
+      }
     },
     {
       "question": "make someone else the workspace owner",
       "expectedSlug": "account-and-workspace",
       "expectedHeading": "Transferring ownership",
-      "rank": 1,
-      "topSimilarity": 0.749,
-      "top": "account-and-workspace > Transferring ownership"
+      "searchQuery": "make someone else workspace owner transfer ownership",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.749,
+        "top": "account-and-workspace > Transferring ownership"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.76,
+        "top": "account-and-workspace > Transferring ownership"
+      }
     },
     {
       "question": "only allow people with our company email to join",
       "expectedSlug": "account-and-workspace",
       "expectedHeading": "Restricting invites",
-      "rank": 1,
-      "topSimilarity": 0.709,
-      "top": "account-and-workspace > Inviting members > Restricting invites to your domain"
+      "searchQuery": "company email domain restriction allowlist join SSO",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.709,
+        "top": "account-and-workspace > Inviting members > Restricting invites to your domain"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.69,
+        "top": "account-and-workspace > Inviting members > Restricting invites to your domain"
+      }
     },
     {
       "question": "connect database behind firewall ssh tunnel",
       "expectedSlug": "connectors-sources",
       "expectedHeading": "Reaching a private database",
-      "rank": 1,
-      "topSimilarity": 0.71,
-      "top": "connectors-sources > Reaching a private database > 2. SSH tunnel"
+      "searchQuery": "SSH tunnel firewall database connection",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.71,
+        "top": "connectors-sources > Reaching a private database > 2. SSH tunnel"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.694,
+        "top": "connectors-sources > Reaching a private database > 2. SSH tunnel"
+      }
     },
     {
       "question": "postgres read only user permissions for meridian",
       "expectedSlug": "connectors-sources",
-      "rank": 1,
-      "topSimilarity": 0.767,
-      "top": "connectors-sources > PostgreSQL > Read-only user for full refresh and incremental"
+      "searchQuery": "postgres read only user permissions meridian sync",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.767,
+        "top": "connectors-sources > PostgreSQL > Read-only user for full refresh and incremental"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.778,
+        "top": "connectors-sources > PostgreSQL > Read-only user for full refresh and incremental"
+      }
     },
     {
       "question": "snowflake key pair auth setup",
       "expectedSlug": "destinations",
       "expectedHeading": "Key-pair",
-      "rank": 1,
-      "topSimilarity": 0.735,
-      "top": "destinations > Snowflake > Key-pair authentication"
+      "searchQuery": "snowflake key pair auth setup",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.735,
+        "top": "destinations > Snowflake > Key-pair authentication"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.735,
+        "top": "destinations > Snowflake > Key-pair authentication"
+      }
     },
     {
       "question": "rows deleted in source still in destination",
       "expectedSlug": "destinations",
       "expectedHeading": "soft",
-      "rank": 1,
-      "topSimilarity": 0.721,
-      "top": "destinations > How Meridian writes data > Deletes are soft by default"
+      "searchQuery": "rows deleted in source still in destination sync delete behavior",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.721,
+        "top": "destinations > How Meridian writes data > Deletes are soft by default"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.744,
+        "top": "destinations > How Meridian writes data > Deletes are soft by default"
+      }
     },
     {
       "question": "incremental vs cdc which should i pick",
       "expectedSlug": "sync-scheduling-and-modes",
       "expectedHeading": "Choosing a mode",
-      "rank": 1,
-      "topSimilarity": 0.764,
-      "top": "sync-scheduling-and-modes > Choosing a mode"
+      "searchQuery": "incremental vs cdc difference which should I pick",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.764,
+        "top": "sync-scheduling-and-modes > Choosing a mode"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.759,
+        "top": "sync-scheduling-and-modes > Choosing a mode"
+      }
     },
     {
       "question": "run sync every day at 2am cron",
       "expectedSlug": "sync-scheduling-and-modes",
       "expectedHeading": "Cron",
-      "rank": 1,
-      "topSimilarity": 0.702,
-      "top": "sync-scheduling-and-modes > Scheduling > Cron scheduling"
+      "searchQuery": "cron schedule sync run every day at 2am",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.702,
+        "top": "sync-scheduling-and-modes > Scheduling > Cron scheduling"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.712,
+        "top": "sync-scheduling-and-modes > Scheduling > Cron scheduling"
+      }
     },
     {
       "question": "verify webhook signature node",
       "expectedSlug": "webhooks",
       "expectedHeading": "Verifying signatures",
-      "rank": 1,
-      "topSimilarity": 0.742,
-      "top": "webhooks > Verifying signatures > Node.js"
+      "searchQuery": "verify webhook signature node js code example",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.742,
+        "top": "webhooks > Verifying signatures > Node.js"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.776,
+        "top": "webhooks > Verifying signatures > Node.js"
+      }
     },
     {
       "question": "webhook retries how many times",
       "expectedSlug": "webhooks",
       "expectedHeading": "Delivery",
-      "rank": 1,
-      "topSimilarity": 0.787,
-      "top": "webhooks > Delivery, retries, and ordering"
+      "searchQuery": "webhook retries how many times",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.787,
+        "top": "webhooks > Delivery, retries, and ordering"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.787,
+        "top": "webhooks > Delivery, retries, and ordering"
+      }
     },
     {
       "question": "max columns per table",
       "expectedSlug": "limits-and-quotas",
       "expectedHeading": "Data shape",
-      "rank": 1,
-      "topSimilarity": 0.729,
-      "top": "limits-and-quotas > Data shape limits"
+      "searchQuery": "max columns per table limits restrictions",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.729,
+        "top": "limits-and-quotas > Data shape limits"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.741,
+        "top": "limits-and-quotas > Data shape limits"
+      }
     },
     {
       "question": "are you soc 2 certified",
       "expectedSlug": "data-security-and-compliance",
       "expectedHeading": "Certifications",
-      "rank": 1,
-      "topSimilarity": 0.712,
-      "top": "data-security-and-compliance > Certifications and attestations"
+      "searchQuery": "SOC 2 certified compliance security",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.712,
+        "top": "data-security-and-compliance > Certifications and attestations"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.691,
+        "top": "data-security-and-compliance > Certifications and attestations"
+      }
     },
     {
       "question": "can we keep data in the EU",
       "expectedSlug": "data-security-and-compliance",
       "expectedHeading": "residency",
-      "rank": 1,
-      "topSimilarity": 0.707,
-      "top": "data-security-and-compliance > Data residency"
+      "searchQuery": "EU data residency region GDPR keep data in EU",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.707,
+        "top": "data-security-and-compliance > Data residency"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.712,
+        "top": "data-security-and-compliance > Data residency"
+      }
     },
     {
       "question": "what's your uptime guarantee",
       "expectedSlug": "support-and-sla",
       "expectedHeading": "Uptime SLA",
-      "rank": 1,
-      "topSimilarity": 0.729,
-      "top": "support-and-sla > Uptime SLA"
+      "searchQuery": "uptime guarantee SLA availability SLA uptime percentage",
+      "raw": {
+        "rank": 1,
+        "topSimilarity": 0.729,
+        "top": "support-and-sla > Uptime SLA"
+      },
+      "rephrased": {
+        "rank": 1,
+        "topSimilarity": 0.723,
+        "top": "support-and-sla > Uptime SLA"
+      }
     },
     {
       "question": "what's the capital of France",
       "expectedSlug": null,
-      "rank": null,
-      "topSimilarity": 0.494,
-      "top": "limits-and-quotas > "
+      "searchQuery": null,
+      "raw": {
+        "rank": null,
+        "topSimilarity": 0.494,
+        "top": "limits-and-quotas > "
+      }
     },
     {
       "question": "is there a meridian mobile app for iphone",
       "expectedSlug": null,
-      "rank": null,
-      "topSimilarity": 0.633,
-      "top": "getting-started > Getting help"
+      "searchQuery": "mobile app iphone",
+      "raw": {
+        "rank": null,
+        "topSimilarity": 0.633,
+        "top": "getting-started > Getting help"
+      },
+      "rephrased": {
+        "rank": null,
+        "topSimilarity": 0.555,
+        "top": "authentication-and-sso > Multi-factor authentication > Enrolling"
+      }
     },
     {
       "question": "do you sync to google sheets",
       "expectedSlug": null,
-      "rank": null,
-      "topSimilarity": 0.615,
-      "top": "connectors-sources > Supported sources"
+      "searchQuery": "google sheets sync destinations supported destinations",
+      "raw": {
+        "rank": null,
+        "topSimilarity": 0.615,
+        "top": "connectors-sources > Supported sources"
+      },
+      "rephrased": {
+        "rank": null,
+        "topSimilarity": 0.714,
+        "top": "destinations > Supported destinations"
+      }
     },
     {
       "question": "who is the CEO of meridian",
       "expectedSlug": null,
-      "rank": null,
-      "topSimilarity": 0.659,
-      "top": "limits-and-quotas > "
+      "searchQuery": "CEO of Meridian Sync",
+      "raw": {
+        "rank": null,
+        "topSimilarity": 0.659,
+        "top": "limits-and-quotas > "
+      },
+      "rephrased": {
+        "rank": null,
+        "topSimilarity": 0.7,
+        "top": "getting-started > "
+      }
     },
     {
       "question": "write me a python script to scrape amazon",
       "expectedSlug": null,
-      "rank": null,
-      "topSimilarity": 0.554,
-      "top": "webhooks > Verifying signatures > Python"
+      "searchQuery": "scrape amazon python script",
+      "raw": {
+        "rank": null,
+        "topSimilarity": 0.554,
+        "top": "webhooks > Verifying signatures > Python"
+      },
+      "rephrased": {
+        "rank": null,
+        "topSimilarity": 0.566,
+        "top": "webhooks > Verifying signatures > Python"
+      }
     }
   ]
 }

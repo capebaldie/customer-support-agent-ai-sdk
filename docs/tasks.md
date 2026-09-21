@@ -342,7 +342,7 @@ One command prints a baseline and updates a committed file.
 
 Misses at rank 1: the `401` → `SYNC-401` exact-token confusion (rank 3), "duplicate rows" → *Rows appear then disappear* (rank 3), overage pricing → MAR definition (rank 2).
 
-**Similarity alone cannot separate in-scope from uncovered.** Lowest correct top-1 is 0.63 (*card declined*); out-of-scope tops reach 0.659 (*who is the CEO*), 0.633 (*mobile app*), 0.615 (*google sheets*). `MIN_SIMILARITY = 0.6` lets three of five through to the model, and no value between 0.63 and 0.66 fixes that without escalating real billing questions. Left at 0.6: the prompt's "sections do not actually answer the question" rule is the real gate for these. Revisit after Task 11.
+**Similarity alone cannot separate in-scope from uncovered.** Lowest correct top-1 is 0.63 (*card declined*); out-of-scope tops reach 0.659 (*who is the CEO*), 0.633 (*mobile app*), 0.615 (*google sheets*). `MIN_SIMILARITY = 0.6` lets three of five through to the model, and no value between 0.63 and 0.66 fixes that without escalating real billing questions. Left at 0.6: the prompt's "sections do not actually answer the question" rule is the real gate for these. **Superseded:** these are raw-question scores. `scripts/rephrase.ts` captured the rephrased queries the gate actually sees, and `eval/baseline.json` scores them: the overlap is wider still, with out-of-scope reaching 0.714.
 
 - **Questions can name a section, not just a doc.** A hit is a matching `docSlug` plus, when `expectedHeading` is set, a `headingPath` containing it. `SYNC-101` and `SYNC-201` live in the same doc, so slug-only matching would count either as correct for both.
 - **`expectedSlug: null`** marks an uncovered question. It stays out of recall and MRR and only feeds `topSimilarity.outOfScope`.
@@ -505,7 +505,15 @@ in-scope and out-of-scope top similarities still overlap at 0.63/0.659.
 
 Each of these waits for the eval number to justify it, or for a real user to ask:
 
-- **Reranking** — `rerank` is already exported from `ai@7`. Try it after hybrid search, and only if Task 11's numbers say recall is fine but precision at 1 is not.
+- **Reranking** — `rerank` is already exported from `ai@7`. The old trigger (recall fine, precision
+  at 1 not) can no longer fire: `eval/baseline.json` has recall@5 1.0, recall@1 0.912, MRR 0.956, so
+  ranking in-scope questions is not the problem. The problem worth spending a reranker on is
+  **out-of-scope detection**. On the `rephrased` column — the string the escalation gate actually
+  sees — correct answers bottom out at 0.638 while out-of-scope questions reach 0.714, so no
+  `MIN_SIMILARITY` separates them. A cross-encoder scores the query and the section together and can
+  see that "google sheets" is absent from the Supported destinations list; a bi-encoder compresses
+  each side to its own vector first and structurally cannot. Measure it on that gap — lowest correct
+  top-1 versus highest out-of-scope — not on recall@1, which has almost no headroom left.
 - **Conversation persistence.**
 - **Better Auth + account-lookup tools.** When built: the user id comes from the **server session**, never as a tool parameter — a model-supplied `userId` is an attacker-influenced input and turns into a data-exfiltration path.
 - **Rate limiting.**
