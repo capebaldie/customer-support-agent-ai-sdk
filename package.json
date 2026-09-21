@@ -13,7 +13,9 @@
     "db:ingest": "node --env-file=.env scripts/ingest.ts",
     "eval": "node --env-file=.env scripts/eval.ts",
     "eval:rephrase": "node --env-file=.env scripts/rephrase.ts",
-    "check:multipart": "node scripts/check-multipart.ts"
+    "check:multipart": "node scripts/check-multipart.ts",
+    "check:captures": "node scripts/check-captures.ts",
+    "chunk:manifest": "node scripts/chunk-manifest.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.58",

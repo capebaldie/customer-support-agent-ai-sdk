@@ -1,0 +1,19 @@
+# Neon branches are deleted by the retrieval workflow's own cleanup step, but a cancelled or crashed
+# run never reaches it. This catches those: abandoned branches otherwise accumulate on the project.
+name: Delete Neon branch
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: neondatabase/delete-branch-action@v3
+        continue-on-error: true # already deleted by the retrieval run is the normal case
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch: ci-pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
