@@ -1,0 +1,167 @@
+# Retrieval fails silently. It does not throw — it returns plausible, wrong chunks. Someone
+# reorganises a doc's headings, recall drops, and the only symptom is a slow rise in support
+# tickets. This workflow is the only thing that notices.
+name: Retrieval
+
+on:
+  pull_request:
+    # GitHub Actions does not support YAML anchors, so this list is repeated below
+    paths:
+      - 'content/docs/**'
+      # schema and migrations: db:migrate below is the only thing that applies them to
+      # production, and a migration PR touches no other path here
+      - 'lib/db/**'
+      # no docs change, but it moves every chunk boundary in the corpus — the largest blast radius
+      # in the repo behind the smallest diff
+      - 'lib/rag/chunk.ts'
+      - 'lib/rag/embedding.ts'
+      - 'lib/rag/search.ts'
+      - 'eval/questions.ts'
+      - 'eval/search-queries.json'
+      - 'scripts/ingest.ts'
+      - 'scripts/eval.ts'
+  push:
+    branches: [main]
+    paths:
+      - 'content/docs/**'
+      # schema and migrations: db:migrate below is the only thing that applies them to
+      # production, and a migration PR touches no other path here
+      - 'lib/db/**'
+      # no docs change, but it moves every chunk boundary in the corpus — the largest blast radius
+      # in the repo behind the smallest diff
+      - 'lib/rag/chunk.ts'
+      - 'lib/rag/embedding.ts'
+      - 'lib/rag/search.ts'
+      - 'eval/questions.ts'
+      - 'eval/search-queries.json'
+      - 'scripts/ingest.ts'
+      - 'scripts/eval.ts'
+
+# a second push supersedes the first run; cancelling frees its Neon branch for neon-cleanup.yml
+concurrency:
+  group: retrieval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Free: no API, no database, no secrets, so it runs on fork PRs too. lib/rag/chunk.ts has no
+  # imports, so the base checkout needs no install. Says which boundaries moved, never whether
+  # retrieval got better — that is the eval's job below.
+  structure:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Diff chunk structure
+        run: |
+          # the head script run against the base tree: it is a harness, the chunker under test is
+          # base/lib/rag/chunk.ts. Copying it also covers the base commit not having the script yet.
+          mkdir -p base/scripts && cp scripts/chunk-manifest.ts base/scripts/
+          (cd base && node scripts/chunk-manifest.ts) > /tmp/base.txt
+          node scripts/chunk-manifest.ts > /tmp/head.txt
+          {
+            echo '### Chunk structure'
+            if diff -q /tmp/base.txt /tmp/head.txt > /dev/null; then
+              echo 'Unchanged.'
+            else
+              echo '```diff'
+              diff /tmp/base.txt /tmp/head.txt || true
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  eval:
+    # fork PRs cannot read secrets; skip rather than fail with a confusing auth error
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the base branch's baseline.json is the only honest comparison
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # A Neon branch is copy-on-write, so it arrives holding every chunk already embedded and the
+      # ingest on it is a diff. A from-scratch database would re-embed all 237 chunks per PR.
+      - name: Create Neon branch
+        if: github.event_name == 'pull_request'
+        id: neon
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch_name: ci-pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Point at the right database
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "::add-mask::${{ steps.neon.outputs.db_url }}"
+            echo "DATABASE_URL=${{ steps.neon.outputs.db_url }}" >> "$GITHUB_ENV"
+          else
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> "$GITHUB_ENV"
+          fi
+
+      # scripts use `node --env-file=.env`, which hard-fails with no .env; call node directly here
+      # drizzle.config.ts reads process.env.DATABASE_URL, which the step above put in the job env
+      - run: pnpm db:migrate
+
+      - name: Ingest
+        env:
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
+        run: |
+          node scripts/ingest.ts | tee /tmp/ingest.log
+          # ingest and eval share one 100/minute embedding budget. A no-op ingest spent none, so the
+          # eval's 78 calls are safe immediately; anything else waits the window out.
+          grep -q 'nothing to do' /tmp/ingest.log || sleep 60
+
+      - name: Eval
+        env:
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
+        run: node scripts/eval.ts
+
+      - name: Compare against the base branch
+        id: report
+        run: |
+          # never the PR's own copy: a docs PR may legitimately regenerate baseline.json, and
+          # comparing it against itself always passes
+          git show "origin/${{ github.base_ref || 'main' }}:eval/baseline.json" > /tmp/base-baseline.json 2>/dev/null || true
+          node scripts/eval-report.ts /tmp/base-baseline.json eval/baseline.json | tee /tmp/report.md
+        continue-on-error: true # comment first, then fail the job on the verdict below
+
+      - name: Comment
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat /tmp/report.md >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "${{ github.event.number }}" --body-file /tmp/report.md --edit-last \
+            || gh pr comment "${{ github.event.number }}" --body-file /tmp/report.md
+
+      - name: Fail on a recall@5 drop
+        if: steps.report.outcome == 'failure'
+        run: |
+          echo "A question fell out of the top 5 entirely. See the comment above."
+          exit 1
+
+      - name: Delete Neon branch
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch: ci-pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}

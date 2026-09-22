@@ -128,6 +128,8 @@ Credits are not issued automatically. You must request them.
 
 Subscribe there for email, SMS, RSS, Slack, or webhook notifications. Subscribe **before** you need it.
 
+You can subscribe to individual components rather than the whole page. If you only sync to one destination, subscribing to that component alone keeps the noise down without missing an incident that affects you.
+
 During an incident Meridian posts an initial acknowledgment within 15 minutes of detection, then updates at least every 30 minutes until resolution. A public post-mortem follows within 5 business days for any P1, covering what happened, the root cause, the customer impact, and the specific changes made to prevent recurrence.
 
 ## Enterprise support
