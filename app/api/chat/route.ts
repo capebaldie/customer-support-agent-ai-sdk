@@ -20,13 +20,23 @@ import { rateLimit } from "@/lib/rate-limit";
 
 const K = 5;
 
-// A coarse floor, not a separator. eval/baseline.json scores both columns: on the `rephrased` one —
-// the string this gate actually sees — correct answers bottom out at 0.638 while out-of-scope
-// questions reach 0.714 ("do you sync to google sheets", which the model rewrites into corpus
-// vocabulary as "google sheets sync destinations supported destinations"). No threshold separates
-// those, so 0.6 is chosen to sit below every correct answer with margin and catch only the clearly
-// off-topic. Deciding whether the sections answer the question is the prompt's job, not this number's.
-const MIN_SIMILARITY = 0.6;
+// A floor against nothing at all, not a separator. eval/baseline.json scores both columns: on the
+// `rephrased` one — the string this gate actually sees — correct answers bottom out at 0.638 while
+// out-of-scope questions reach 0.714 ("do you sync to google sheets", which the model rewrites into
+// corpus vocabulary as "google sheets sync destinations supported destinations"). No threshold
+// separates those. Deciding whether the sections answer the question is the prompt's job, not this
+// number's.
+//
+// Was 0.6, lowered after a false escalation that showed what the number actually measures.
+// "is rupay credit card supported" retrieves Billing > Payment methods at top-1 — the section
+// listing every card accepted, which answers it — and scored 0.568, while the same question padded
+// with "for payment" scored 0.633 and was answered. A brand name absent from the corpus costs ~0.08
+// of cosine similarity whether or not the retrieved section covers the question, so at 0.6 the gate
+// was withholding correct retrievals from questions that name a product Meridian does not support —
+// which is most of what a support user types. It never caught the out-of-scope ones anyway: they
+// sail past at 0.7. 0.5 keeps the one job the eval shows a threshold can still do — catch the
+// query that matched nothing — and leaves the rest to the prompt's answer-only-from-sections rule.
+const MIN_SIMILARITY = 0.5;
 
 // Gemini's free tier is 5 requests a minute, shared by everyone hitting this deployment. Matching
 // that per caller means one client can reach the ceiling but cannot hold it there. It does not
@@ -121,6 +131,9 @@ export async function POST(req: Request) {
       generateMessageId: () => messageId,
       // default hides every error as "An error occurred"; name the quota case, keep the rest hidden
       onError: (error) => {
+        // the two strings below are all the client ever sees; without this the real cause
+        // (503 overload, an embedding 4xx, a Neon connection drop) is gone for good
+        console.error("chat stream error", error);
         const last = RetryError.isInstance(error) ? error.lastError : error;
         return APICallError.isInstance(last) && last.statusCode === 429
           ? "The assistant is over its usage limit right now. Please try again later."

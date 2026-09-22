@@ -282,7 +282,7 @@ A scratch call for *"why did my sync fail with 401"* returns `SYNC-101` in the t
 
 - [x] Add a `searchKnowledgeBase` tool wrapping Task 5, `inputSchema: z.object({ query: z.string() })`
 - [x] System prompt: answer only from retrieved content, cite the `url`
-- [x] **Escalation gate.** When the top similarity falls below a threshold, decline and hand off to support@meridiandata.com instead of generating. A confidently wrong answer about billing is worse than "let me get someone." Provisional `MIN_SIMILARITY = 0.6` from a 7-query probe (in-scope ≥0.68, off-topic ~0.50, uncovered 0.56); replace from Task 8. Task 8 found no clean value (in-scope low 0.63, out-of-scope high 0.659) — see its Outcome.
+- [x] **Escalation gate.** When the top similarity falls below a threshold, decline and hand off to support@meridiandata.com instead of generating. A confidently wrong answer about billing is worse than "let me get someone." Provisional `MIN_SIMILARITY = 0.6` from a 7-query probe (in-scope ≥0.68, off-topic ~0.50, uncovered 0.56); replace from Task 8. Task 8 found no clean value (in-scope low 0.63, out-of-scope high 0.659) — see its Outcome. **Now 0.5**, lowered on a false escalation from real use — see Task 12.
 - [x] Fix `timeout: 10000` → `{ firstChunkMs: 30_000 }` (free-tier Gemini is slow to start)
 - [ ] Raise `maxOutputTokens` 512 → 2000 — kept at 512 for now; raise if answers truncate
 
@@ -535,6 +535,50 @@ in-scope and out-of-scope top similarities still overlap at 0.63/0.659.
   it costs one index.~~ **Wrong.** The premise was plausible and the measurement disagreed; see the
   outcome above. This is what the eval is for.
 - Fuse by rank, not by raw score. Cosine similarity and `ts_rank` are not on the same scale and averaging them is meaningless. **Still true** — the attempt did fuse by rank.
+
+---
+
+## Task 12 — MIN_SIMILARITY 0.6 → 0.5, on a false escalation — DONE
+
+**File:** `app/api/chat/route.ts`
+
+*"is rupay credit card supported"* escalated. The same question as *"is rupay credit card supported
+for payment"* was answered. Both retrieve the same top-1 section — `Billing, Invoices, and Payments
+> Payment methods`, the one listing every card Meridian accepts, which answers the question — at
+0.568 and 0.633. The gate, not retrieval, is the whole difference.
+
+```
+0.633  "rupay credit card payment supported billing pricing"   → Billing > Payment methods
+0.589  "rupay credit card payment methods"                     → Billing > Payment methods
+0.568  "is rupay credit card supported"                        → Billing > Payment methods
+0.666  "credit card payment methods accepted"                  → Billing > Payment methods
+```
+
+**What the number actually measures.** A brand name absent from the corpus costs ~0.08 of cosine
+similarity, and it costs that whether or not the retrieved section answers the question — the
+penalty is for vocabulary, not for coverage. Padding the query with corpus words ("billing",
+"pricing") buys it back. So at 0.6 the gate was systematically withholding correct retrievals from
+any question naming a product Meridian does not support, which is a large share of what a support
+user types: *is X supported*, *do you work with Y*. Meanwhile it never caught the out-of-scope
+questions it was built for — Task 8 measured those sailing past at 0.7.
+
+At 0.5 the floor keeps the one job the eval shows a threshold can still do: catch a query that
+matched nothing. Everything else is the prompt's answer-only-from-sections rule, which is what Task
+6 already concluded and what the comment on the constant already said.
+
+Costs nothing: `MIN_SIMILARITY` lives in the route, not in `INSTRUCTIONS`, so `check:captures`
+passes untouched and `eval/baseline.json` is unaffected — the eval scores retrieval, which did not
+change. Confirmed against the running app: the question now answers with the card list and adds
+*"RuPay credit cards are not listed as a supported payment method"* on its own.
+
+### Gotchas found
+
+- **A threshold on a bi-encoder score cannot tell "absent vocabulary" from "absent coverage."** The
+  one number moves for both, which is why two years of tuning it would not have found this. The
+  deferred reranker is the only thing that reads the query and the section together.
+- **The closed-list negative arrived for free.** The earlier worry was that the model lists the four
+  accepted cards without saying RuPay is not among them. Given the section, it says so unprompted.
+  No `INSTRUCTIONS` clause was needed, and the two-day recapture it would have cost was not spent.
 
 ---
 
