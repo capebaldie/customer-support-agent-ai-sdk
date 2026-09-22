@@ -31,9 +31,9 @@ For REST API request errors rather than sync run failures, see [API Error Codes]
 
 ## Source errors — `SYNC-1xx`
 
-### `SYNC-101` — Source authentication failed
+### Authentication failed
 
-Meridian reached the source but the credentials were rejected.
+Meridian reached the source or the destination but the credentials were rejected.
 
 Common causes, in the order they actually happen:
 
@@ -42,6 +42,13 @@ Common causes, in the order they actually happen:
 - **The user was dropped or locked** at the source.
 - **A permission was revoked**, so the login works but the required grant is gone.
 - **IP restriction at the source** — Salesforce login IP ranges, Snowflake network policies, and Postgres `pg_hba.conf` all produce authentication-shaped errors when they are really network rules.
+
+Warehouse-specific causes:
+
+- **Snowflake** — password expired, key-pair rotated, user disabled, or a network policy blocking Meridian's IPs.
+- **BigQuery** — service account key deleted or disabled, or the service account removed from the project.
+- **Redshift** — password changed, or the cluster is in a different VPC than the security group allows.
+- **Databricks** — personal access token expired. Tokens have a maximum lifetime; check the expiry.
 
 Fix: edit the connection, enter working credentials, click **Test connection**, save. The next scheduled run picks it up, or trigger one manually.
 
@@ -115,17 +122,6 @@ Fix:
 - Lower **Batch size** so each query does less work.
 
 ## Destination errors — `SYNC-2xx`
-
-### `SYNC-201` — Destination authentication failed
-
-Meridian reached the destination but could not authenticate. Same shape as `SYNC-101`.
-
-Warehouse-specific causes:
-
-- **Snowflake** — password expired, key-pair rotated, user disabled, or a network policy blocking Meridian's IPs.
-- **BigQuery** — service account key deleted or disabled, or the service account removed from the project.
-- **Redshift** — password changed, or the cluster is in a different VPC than the security group allows.
-- **Databricks** — personal access token expired. Tokens have a maximum lifetime; check the expiry.
 
 ### `SYNC-202` — Destination permission denied
 
