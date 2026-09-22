@@ -49,6 +49,17 @@ defaults:
   run:
     shell: bash
 
+# Node's Happy Eyeballs abandons a TCP handshake after 250ms per address and moves to the next one.
+# Neon is in ap-southeast-1 and this runner is not, so an ordinary cross-region handshake lands on
+# that limit: every address is abandoned and the error surfaces as AggregateError [ETIMEDOUT]
+# naming all of them, which reads like the database being down. Three ingests died that way against
+# a database that was up and answering in ~100ms from a nearer network.
+#
+# lib/db/index.ts raises this for anything importing the app's client. drizzle-kit brings its own
+# connection and never touches that module, so `pnpm db:migrate` needs it from the environment.
+env:
+  NODE_OPTIONS: --network-family-autoselection-attempt-timeout=5000
+
 jobs:
   # Free: no API, no database, no secrets, so it runs on fork PRs too. lib/rag/chunk.ts has no
   # imports, so the base checkout needs no install. Says which boundaries moved, never whether
