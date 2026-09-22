@@ -1,27 +1,261 @@
 @import "tailwindcss";
 @source "../node_modules/streamdown/dist/*.js";
 
+/* Blue-and-navy on white, from the reference design. Tokens are semantic and flip in the media
+   query below, so nothing in the markup carries a `dark:` variant: one definition per colour, not
+   two per element. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --paper: #ffffff;
+  /* the periwinkle band the reference puts behind the composer */
+  --wash: #f4f6fd;
+  --vellum: #fafbfe;
+  --ink: #1b2a56;
+  --depth: #6b7590;
+  --rule: #e9ecf5;
+  /* --rule divides rows, which is decorative and exempt from contrast rules. --edge bounds a
+     control someone has to find and click, so it clears the 3:1 that WCAG 1.4.11 asks of UI
+     boundaries (measured 3.1:1 light, 3.2:1 dark). Two jobs, not one colour at two strengths. */
+  --edge: #8b93a8;
+  --signal: #2b59e8;
+  /* text on a --signal fill: white is unreadable on the lighter blue dark mode uses */
+  --on-signal: #ffffff;
+  --positive: #0f9d63;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #0e1016;
+    --wash: #141824;
+    --vellum: #161a24;
+    --ink: #e8ebf2;
+    --depth: #98a2ba;
+    --rule: #242938;
+    --edge: #5b6479;
+    --signal: #6f97ff;
+    --on-signal: #0e1016;
+    --positive: #35c98d;
   }
 }
 
+@theme inline {
+  --color-paper: var(--paper);
+  --color-wash: var(--wash);
+  --color-vellum: var(--vellum);
+  --color-ink: var(--ink);
+  --color-depth: var(--depth);
+  --color-rule: var(--rule);
+  --color-edge: var(--edge);
+  --color-signal: var(--signal);
+  --color-on-signal: var(--on-signal);
+  --color-positive: var(--positive);
+
+  /* Streamdown ships its own chrome — the external-link confirmation, the code-block action bar,
+     the image download button — styled with shadcn's token names. This project never defined them
+     (the original globals.css had only background/foreground), so all of that UI rendered with no
+     surface. Mapping them here is what makes Streamdown's own components match the page. */
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-border: var(--rule);
+  --color-muted: var(--vellum);
+  --color-muted-foreground: var(--depth);
+  --color-primary: var(--signal);
+  --color-primary-foreground: var(--on-signal);
+  --color-sidebar: var(--vellum);
+
+  --font-sans: var(--font-archivo);
+  --font-serif: var(--font-source-serif);
+  --font-mono: var(--font-source-code);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  /* var(--font-sans), not a hardcoded stack: layout.tsx loads the faces and @theme inline maps
+     them here. This rule sits after the tailwind import, so anything literal here silently wins
+     over it. */
+  font-family: var(--font-sans);
+}
+
+/* Tailwind v4 defaults a bare `border` to currentColor, and Streamdown writes bare `border` on its
+   modal and buttons — which would outline them in body-text ink. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--rule);
+  }
+
+  /* Browsers give <button> the arrow cursor, and Tailwind's preflight does not override it.
+     Disabled is excluded: the arrow is the honest signal that a click will do nothing. */
+  button:not(:disabled),
+  summary,
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
+/* Streamdown's own overlays bring backdrop blur with them. Unlayered rules beat the utilities in
+   `@import "tailwindcss"`, which are in a cascade layer, so no !important is needed. */
+[data-streamdown="link-safety-modal"] {
+  background: rgb(12 18 40 / 0.5);
+  backdrop-filter: none;
+}
+
+[data-streamdown="code-block-actions"],
+[data-streamdown="mermaid-block-actions"],
+[data-streamdown="image-overlay"] {
+  background: var(--vellum);
+  backdrop-filter: none;
+}
+
+[data-streamdown="mermaid-fullscreen"] {
+  background: var(--paper);
+  backdrop-filter: none;
+}
+
+/* Keyboard focus has to stay visible against both grounds; the accent reads on either. */
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* A flex <summary> drops the default disclosure marker in Chrome, leaving a row that does not
+   look expandable. page.tsx supplies its own caret. */
+summary {
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The comment box is a native <dialog>: showModal() brings the focus trap, Esc to dismiss, an
+   inert background and correct stacking with no library and no extra state. */
+dialog {
+  margin: auto;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+dialog::backdrop {
+  background: rgb(12 18 40 / 0.5);
+}
+
+/* Answer prose. Streamdown renders plain elements, so descendant selectors reach them without
+   fighting its utility classes. No max-width here: in a conversation <main> is max-w-2xl, the same
+   box the composer sits in, and that column is the measure. Capping the prose again only pulled
+   its right edge off the input's. */
+.answer {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+.answer > * + * {
+  margin-top: 0.85em;
+}
+
+.answer h1,
+.answer h2,
+.answer h3,
+.answer h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  margin-top: 1.6em;
+}
+
+.answer ul,
+.answer ol {
+  padding-left: 1.3em;
+}
+
+.answer ul {
+  list-style: disc;
+}
+
+.answer ol {
+  list-style: decimal;
+}
+
+.answer li + li {
+  margin-top: 0.3em;
+}
+
+.answer li::marker {
+  color: var(--depth);
+}
+
+.answer a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Error codes are the reason a reader is here, so they get the machine face and a quiet chip.
+   nowrap because SYNC-201 broken across two lines is the one string they came to copy. */
+.answer code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--vellum);
+  border: 1px solid var(--rule);
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.answer pre {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  background: var(--vellum);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  overflow-x: auto;
+}
+
+.answer pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  white-space: pre;
+}
+
+.answer blockquote {
+  border-left: 3px solid var(--rule);
+  padding-left: 0.9rem;
+  color: var(--depth);
+}
+
+.answer table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.answer th,
+.answer td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.4rem 0.6rem 0.4rem 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.answer th {
+  font-weight: 600;
+  color: var(--depth);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
