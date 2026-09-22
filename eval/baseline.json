@@ -3,13 +3,13 @@
   "coverage": "38/39 questions captured by scripts/rephrase.ts",
   "raw": {
     "n": 34,
-    "recallAt1": 0.912,
+    "recallAt1": 0.882,
     "recallAt5": 1,
-    "mrr": 0.946,
+    "mrr": 0.926,
     "topSimilarity": {
       "correctAt1": [
-        0.63,
-        0.659,
+        0.636,
+        0.66,
         0.667,
         0.687,
         0.696,
@@ -35,7 +35,6 @@
         0.767,
         0.769,
         0.771,
-        0.775,
         0.779,
         0.787,
         0.809
@@ -43,6 +42,7 @@
       "incorrectAt1": [
         0.704,
         0.712,
+        0.785,
         0.794
       ],
       "outOfScope": [
@@ -55,13 +55,13 @@
   },
   "rephrased": {
     "n": 34,
-    "recallAt1": 0.912,
+    "recallAt1": 0.882,
     "recallAt5": 1,
-    "mrr": 0.956,
+    "mrr": 0.941,
     "topSimilarity": {
       "correctAt1": [
-        0.638,
-        0.651,
+        0.642,
+        0.65,
         0.687,
         0.689,
         0.69,
@@ -82,7 +82,6 @@
         0.744,
         0.744,
         0.757,
-        0.757,
         0.759,
         0.76,
         0.776,
@@ -95,6 +94,7 @@
       "incorrectAt1": [
         0.676,
         0.746,
+        0.763,
         0.774
       ],
       "outOfScope": [
@@ -303,14 +303,14 @@
       "expectedSlug": "plans-and-pricing",
       "searchQuery": "monthly active row",
       "raw": {
-        "rank": 1,
-        "topSimilarity": 0.775,
-        "top": "plans-and-pricing > What a Monthly Active Row is > Worked example"
+        "rank": 2,
+        "topSimilarity": 0.785,
+        "top": "limits-and-quotas > What counts as a Monthly Active Row"
       },
       "rephrased": {
-        "rank": 1,
-        "topSimilarity": 0.757,
-        "top": "plans-and-pricing > What a Monthly Active Row is"
+        "rank": 2,
+        "topSimilarity": 0.763,
+        "top": "limits-and-quotas > What counts as a Monthly Active Row"
       }
     },
     {
@@ -319,7 +319,7 @@
       "expectedHeading": "Overage",
       "searchQuery": "overage charges row limit pricing",
       "raw": {
-        "rank": 2,
+        "rank": 3,
         "topSimilarity": 0.704,
         "top": "plans-and-pricing > What a Monthly Active Row is"
       },
@@ -367,12 +367,12 @@
       "searchQuery": "card declined account status billing failed",
       "raw": {
         "rank": 1,
-        "topSimilarity": 0.63,
+        "topSimilarity": 0.636,
         "top": "billing-and-invoices > Failed payments and dunning"
       },
       "rephrased": {
         "rank": 1,
-        "topSimilarity": 0.638,
+        "topSimilarity": 0.642,
         "top": "billing-and-invoices > Failed payments and dunning"
       }
     },
@@ -383,12 +383,12 @@
       "searchQuery": "refund policy refund",
       "raw": {
         "rank": 1,
-        "topSimilarity": 0.659,
+        "topSimilarity": 0.66,
         "top": "billing-and-invoices > Refunds and credits"
       },
       "rephrased": {
         "rank": 1,
-        "topSimilarity": 0.651,
+        "topSimilarity": 0.65,
         "top": "billing-and-invoices > Refunds and credits"
       }
     },
