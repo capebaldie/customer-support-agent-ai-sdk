@@ -7,6 +7,9 @@ import { rateLimit } from "@/lib/rate-limit";
 const body = z.object({
   messageId: z.uuid(),
   feedback: z.enum(["up", "down"]),
+  // trust boundary: free text straight from the browser, so it is length-capped here rather
+  // than relying on the input's maxLength. Sent as a second request after the vote itself.
+  comment: z.string().trim().max(500).optional(),
 });
 
 export async function POST(req: Request) {
@@ -18,8 +21,12 @@ export async function POST(req: Request) {
   const parsed = body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return new Response("invalid feedback", { status: 400 });
 
-  const { messageId, feedback } = parsed.data;
+  const { messageId, feedback, comment } = parsed.data;
   // an answer with no search has no rows; there is nothing to attach feedback to
-  await db.update(retrievals).set({ feedback }).where(eq(retrievals.messageId, messageId));
+  await db
+    .update(retrievals)
+    // an empty box after trimming is not a comment — leave whatever is already stored alone
+    .set(comment ? { feedback, comment } : { feedback })
+    .where(eq(retrievals.messageId, messageId));
   return new Response(null, { status: 204 });
 }

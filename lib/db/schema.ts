@@ -71,6 +71,10 @@ export const retrievals = pgTable(
     inputTokens: integer(),
     outputTokens: integer(),
     feedback: text({ enum: ["up", "down"] }),
+    // free text from the thumbs-down box, optional. A bare `down` only says someone was unhappy;
+    // this is what distinguishes retrieval missing, the model ignoring sections it was given, and
+    // half a two-part question going unanswered — three different fixes.
+    comment: text(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
