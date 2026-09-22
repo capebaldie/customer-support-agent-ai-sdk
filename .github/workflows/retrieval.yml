@@ -42,6 +42,13 @@ concurrency:
   group: retrieval-${{ github.ref }}
   cancel-in-progress: true
 
+# `node x | tee y` returns tee's status, not node's, under the default shell — which silently
+# swallowed a failing eval gate. `shell: bash` gets -eo pipefail, so a failure anywhere in a
+# pipeline fails the step.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   # Free: no API, no database, no secrets, so it runs on fork PRs too. lib/rag/chunk.ts has no
   # imports, so the base checkout needs no install. Says which boundaries moved, never whether
