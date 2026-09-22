@@ -2,7 +2,7 @@
 title: Data Security and Compliance
 slug: data-security-and-compliance
 category: security
-url: https://docs.meridiandata.com/data-security-and-compliance
+url: /docs/data-security-and-compliance
 updated: 2026-07-15
 audience: all
 ---
@@ -75,11 +75,11 @@ The region is fixed at workspace creation and **cannot be changed**. Moving mean
 
 ## Network security
 
-Meridian connects **outbound** to your systems from static egress IP addresses per region — listed in [Getting Started](https://docs.meridiandata.com/getting-started). You never open an inbound path to Meridian, and you can restrict source access to exactly those addresses.
+Meridian connects **outbound** to your systems from static egress IP addresses per region — listed in [Getting Started](/docs/getting-started). You never open an inbound path to Meridian, and you can restrict source access to exactly those addresses.
 
 These IPs are stable and Meridian gives **30 days' notice** by email before changing them.
 
-Where you cannot allowlist, use an SSH tunnel through a bastion, or the reverse-tunnel agent on Enterprise, which requires no inbound access at all. Both are covered in [Sources and Connectors](https://docs.meridiandata.com/connectors-sources).
+Where you cannot allowlist, use an SSH tunnel through a bastion, or the reverse-tunnel agent on Enterprise, which requires no inbound access at all. Both are covered in [Sources and Connectors](/docs/connectors-sources).
 
 Dedicated egress IP ranges are available on Enterprise for $500/month.
 
@@ -156,7 +156,7 @@ Report a vulnerability to security@meridiandata.com. A PGP key is published at [
 - Recovery objectives: **RPO 5 minutes, RTO 4 hours.**
 - Disaster recovery is tested twice a year, and the test results are summarized in the SOC 2 report.
 
-A Meridian outage does not put your data at risk. Data already in your warehouse is unaffected, and syncs resume from their last committed position when service is restored — the one caveat being CDC sources whose log retention is shorter than the outage, covered under `SYNC-105` in [Troubleshooting Sync Failures](https://docs.meridiandata.com/troubleshooting-sync-failures).
+A Meridian outage does not put your data at risk. Data already in your warehouse is unaffected, and syncs resume from their last committed position when service is restored — the one caveat being CDC sources whose log retention is shorter than the outage, covered under `SYNC-105` in [Troubleshooting Sync Failures](/docs/troubleshooting-sync-failures).
 
 ## Incident response
 

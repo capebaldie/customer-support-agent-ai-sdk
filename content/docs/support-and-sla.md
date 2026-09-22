@@ -2,7 +2,7 @@
 title: Support and Service Level Agreement
 slug: support-and-sla
 category: support
-url: https://docs.meridiandata.com/support-and-sla
+url: /docs/support-and-sla
 updated: 2026-08-08
 audience: all
 ---
@@ -13,7 +13,7 @@ audience: all
 
 | Channel | Available on | How |
 | --- | --- | --- |
-| Documentation | All | [docs.meridiandata.com](https://docs.meridiandata.com) |
+| Documentation | All | [Browse the docs](/docs) |
 | Community forum | All | [community.meridiandata.com](https://community.meridiandata.com) |
 | Email | All | support@meridiandata.com, or **Help → Contact support** in the app |
 | In-app chat | Scale, Enterprise | The chat bubble, bottom right |
@@ -63,7 +63,7 @@ You set the severity when you open a ticket. Meridian may reclassify, and will t
 
 **Cannot:**
 
-- Read back your stored credentials. Nobody can — see [Data Security and Compliance](https://docs.meridiandata.com/data-security-and-compliance).
+- Read back your stored credentials. Nobody can — see [Data Security and Compliance](/docs/data-security-and-compliance).
 - Access your row data without your explicit written approval for a specific case.
 - Make changes inside your source or destination systems.
 - Debug your dbt models, warehouse performance, or downstream tooling.

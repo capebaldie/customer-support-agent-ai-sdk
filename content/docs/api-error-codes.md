@@ -2,7 +2,7 @@
 title: API Error Codes
 slug: api-error-codes
 category: developer
-url: https://docs.meridiandata.com/api-error-codes
+url: /docs/api-error-codes
 updated: 2026-09-01
 audience: developer
 ---
@@ -19,7 +19,7 @@ Every Meridian API error returns the same JSON envelope:
     "type": "rate_limit_error",
     "param": null,
     "request_id": "req_7d3f9a2b8c1e",
-    "doc_url": "https://docs.meridiandata.com/api-error-codes#rate_limit_exceeded"
+    "doc_url": "/docs/api-error-codes#rate_limit_exceeded"
   }
 }
 ```
@@ -28,7 +28,7 @@ Every Meridian API error returns the same JSON envelope:
 
 `param` names the offending field when the error is about a specific input, so you can attribute a validation failure without parsing prose.
 
-For sync run failures — as opposed to API request failures — see [Troubleshooting Sync Failures](https://docs.meridiandata.com/troubleshooting-sync-failures), which covers the `SYNC-xxx` codes.
+For sync run failures — as opposed to API request failures — see [Troubleshooting Sync Failures](/docs/troubleshooting-sync-failures), which covers the `SYNC-xxx` codes.
 
 ## Error types
 
@@ -103,11 +103,11 @@ Scopes cannot be added to an existing key. Create a new key with the right scope
 
 The operation is allowed for your role but not on your plan. Examples: creating a fourth connection on Starter, a fourth destination on Growth, or enabling CDC on Starter.
 
-The message names the limit and the plan that lifts it. See [Limits and Quotas](https://docs.meridiandata.com/limits-and-quotas).
+The message names the limit and the plan that lifts it. See [Limits and Quotas](/docs/limits-and-quotas).
 
 ### `workspace_suspended`
 
-The workspace is suspended for non-payment. All write endpoints return this; read endpoints keep working. Settle the outstanding invoice — see [Billing, Invoices, and Payments](https://docs.meridiandata.com/billing-and-invoices).
+The workspace is suspended for non-payment. All write endpoints return this; read endpoints keep working. Settle the outstanding invoice — see [Billing, Invoices, and Payments](/docs/billing-and-invoices).
 
 ## 404 — Not found
 
@@ -164,11 +164,11 @@ The `details` array lists every problem found, not just the first:
 
 ### `incompatible_sync_mode`
 
-The requested sync mode is not supported for that source and table combination — for example log-based CDC against a source with no change log, or incremental against a table with no monotonically increasing column. See [Sync Modes and Scheduling](https://docs.meridiandata.com/sync-scheduling-and-modes).
+The requested sync mode is not supported for that source and table combination — for example log-based CDC against a source with no change log, or incremental against a table with no monotonically increasing column. See [Sync Modes and Scheduling](/docs/sync-scheduling-and-modes).
 
 ### `connection_unreachable`
 
-Meridian could not reach the source or destination while validating. This is a connectivity problem, not a configuration one — check firewall rules and the egress IP allowlist in [Getting Started](https://docs.meridiandata.com/getting-started).
+Meridian could not reach the source or destination while validating. This is a connectivity problem, not a configuration one — check firewall rules and the egress IP allowlist in [Getting Started](/docs/getting-started).
 
 ## 429 — Rate limiting
 
