@@ -604,6 +604,16 @@ Each of these waits for the eval number to justify it, or for a real user to ask
   `INSTRUCTIONS`, which invalidates every capture in `eval/search-queries.json` and costs two days
   against the 20/day free-tier cap. Wait for a thumbs-down that shows it happening. The both-halves-
   covered case already works and `scripts/check-multipart.ts` guards it.
+- **Stop embedding markdown link targets.** `embeddingInput` is the raw section text, so
+  `[Plans and Pricing](/docs/plans-and-pricing)` embeds the address as well as the words. Nobody
+  searches for a URL; it is filler diluting the sentence. 49 of 237 chunks carry one, about 1,530
+  characters of address across the corpus. Rewriting docs links from absolute to relative proved
+  the cost: one chunk lost 24 of its 509 characters and that was enough to take rank 1 from
+  `plans-and-pricing` for *"what counts as a monthly active row"*, moving recall@1 0.912 → 0.882
+  with recall@5 untouched. Stripping targets would make any future URL edit free — no re-embed, no
+  eval movement. Strip from `embeddingInput` only: `content` is a separate column and is what
+  `search.ts` returns to the model, so answers keep working links. Costs one re-embed of those 49
+  chunks, and the eval will move again when it lands, so give it its own PR.
 - **Conversation persistence.**
 - **Better Auth + account-lookup tools.** When built: the user id comes from the **server session**, never as a tool parameter — a model-supplied `userId` is an attacker-influenced input and turns into a data-exfiltration path.
 - **Rate limiting that survives more than one instance.** `lib/rate-limit.ts` caps a caller at 5 chat

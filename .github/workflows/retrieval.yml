@@ -151,6 +151,19 @@ jobs:
           GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
         run: node scripts/eval.ts
 
+      # The job has just computed the correct scores for this change; without this they die with the
+      # runner. Accepting a legitimate shift then means merging first, waiting for the production
+      # ingest, and re-running the eval locally for 78 embedding calls. Uploaded, it is a download
+      # and a commit into the same PR, before the merge. `if: always()` so a failing gate — the case
+      # where you most want the file — still hands it over.
+      - name: Upload the regenerated baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-baseline
+          path: eval/baseline.json
+          if-no-files-found: error
+
       - name: Compare against the base branch
         id: report
         run: |
