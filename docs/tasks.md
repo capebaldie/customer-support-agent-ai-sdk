@@ -356,29 +356,66 @@ Misses at rank 1: the `401` → `SYNC-401` exact-token confusion (rank 3), "dupl
 
 ---
 
-## Task 9 — CI: ingest on merge, eval on every PR
+## Task 9 — CI: ingest on merge, eval on every PR — DONE
 
-**File:** `.github/workflows/ci.yml`
+**Files:** `.github/workflows/ci.yml`, `.github/workflows/retrieval.yml`,
+`.github/workflows/neon-cleanup.yml`, `scripts/check-captures.ts`, `scripts/chunk-manifest.ts`,
+`scripts/eval-report.ts`
 
 Retrieval fails **silently**. It does not throw — it returns plausible, wrong chunks. Someone reorganizes a doc's headings, recall drops, and the only symptom is a slow rise in support tickets. This job is the only thing that notices.
 
-### Steps
+### What landed
 
-- [ ] **On a PR touching `content/docs/**`:** create a Neon branch, run `db:migrate` and `ingest` against it, run the eval, post recall@1 / recall@5 / MRR as a PR comment with the delta against `eval/baseline.json`, delete the branch.
-- [ ] **On merge to main:** run `ingest` against production, re-run the eval, fail the job if recall@5 drops more than a set margin below the baseline.
-- [ ] Keep the existing `lint` + `build` job as-is; docs jobs are separate and only run on the paths that matter.
-- [ ] Add `node --test lib/rag/*.test.ts` to the always-run job. The chunker test costs nothing and guards every task downstream.
+- [x] **Always, free, fork-safe** (`ci.yml`): lint, build, `node --test lib/rag/*.test.ts`, and
+  `check-captures.ts`, which fails when `eval/search-queries.json` was captured under a different
+  prompt than `lib/rag/prompt.ts`. Deleting that file is the deliberate way out.
+- [x] **PR, free, fork-safe** (`retrieval.yml`, job `structure`): `chunk-manifest.ts` emitted at the
+  base commit and at the head, then diffed. `lib/rag/chunk.ts` has no imports, so the base checkout
+  needs no install.
+- [x] **PR** (`retrieval.yml`, job `eval`): Neon branch, `db:migrate`, `ingest`, eval, compare
+  against the base branch's `baseline.json`, comment, delete the branch. Gates on recall@5.
+- [x] **On merge to main:** the same job against production, skipping the branch and the comment.
+- [x] Branch cleanup on PR close (`neon-cleanup.yml`), for runs cancelled before their own cleanup.
 
-### Done when
+### Verified
 
-A PR that renames a heading in `content/docs/` gets a comment with its retrieval scores before anyone merges it.
+A PR merging the `SYNC-101` and `SYNC-201` sections under one heading went red with recall@1
+0.912 → 0.824 and recall@5 1.000 → 0.882, and the comment named all four broken questions —
+including that `SYNC-201 bigquery service account key deleted` had migrated to
+`destinations > Google BigQuery`, a different document entirely.
 
-### Gotchas
+### Gotchas found
 
-- **Secrets are manual here.** This project uses Neon standalone, not the Vercel integration, so `NEON_API_KEY`, `NEON_PROJECT_ID`, and `GOOGLE_GENERATIVE_AI_API_KEY` go into repository secrets by hand. There is no `neon env pull` shortcut.
-- **A Neon branch copies the parent's data**, so the preview branch arrives with 237 chunks already embedded and the ingest on it is a diff like any other. This is the reason Task 4 had to land first: a full rebuild per PR would embed the whole corpus every time.
-- Delete the branch on PR close, not only on merge. Abandoned branches accumulate.
-- The eval spends ~30 embedding calls per run. Trivial in cost, but it is a real API call — it needs the key, and it will fail on a fork PR that has no access to secrets.
+- **A pipe swallows the exit code, and the gate was dead for two runs.**
+  `node scripts/eval-report.ts | tee` returns `tee`'s status, so a failing gate looked like a
+  passing step and the job keyed off its outcome never ran. Both runs reported the regression
+  correctly and stayed green. Fixed with `defaults.run.shell: bash`, which is `-eo pipefail`.
+  The same shape in the Ingest step would have let a half-ingested branch be scored as a docs
+  regression.
+- **`lib/rag/chunk.ts` needs its own entry in the path filter.** A chunker change edits no markdown,
+  so `content/docs/**` never fires — yet it moves every boundary in the corpus. Largest blast
+  radius in the repo behind the smallest diff.
+- **`lib/db/**` too**, or a migration-only PR gets neither the rehearsal nor the production
+  `db:migrate`.
+- **The eval costs 78 embedding calls, not ~30** — 39 questions in two columns. It shares the
+  100/minute budget with `ingest`, so the job waits out the window unless ingest said
+  "nothing to do".
+- **Compare against the base branch's baseline, not the PR's.** `eval.ts` overwrites
+  `eval/baseline.json` in place, and a docs PR may legitimately commit a new one.
+- **GitHub Actions supports neither YAML anchors nor sharing a path list between files**, so
+  `retrieval.yml` and `neon-cleanup.yml` hold the same nine paths by hand. A path in one but not
+  the other leaks a Neon branch per PR, silently.
+- **The first PR has no comparable baseline** and therefore cannot gate. One-time; it resolves once
+  `main` carries the two-column shape.
+- Never promote a Neon branch back to production: `retrievals` is written on every search, so a
+  branch snapshot is stale the moment a user asks a question. Re-ingesting on merge is the cheap
+  correct path.
+
+### Gotchas as written before the attempt
+
+- **Secrets are manual here.** This project uses Neon standalone, not the Vercel integration, so `NEON_API_KEY`, `NEON_PROJECT_ID`, and `GOOGLE_GENERATIVE_AI_API_KEY` go into repository secrets by hand. There is no `neon env pull` shortcut. **Still true** — and use `neon api-keys create --project-id`, which scopes the key to this project.
+- **A Neon branch copies the parent's data**, so the preview branch arrives with 237 chunks already embedded and the ingest on it is a diff like any other. This is the reason Task 4 had to land first: a full rebuild per PR would embed the whole corpus every time. **Still true, and load-bearing.**
+- Delete the branch on PR close, not only on merge. Abandoned branches accumulate. **Still true.**
 
 ---
 
