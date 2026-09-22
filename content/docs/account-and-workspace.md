@@ -2,7 +2,7 @@
 title: Account and Workspace Management
 slug: account-and-workspace
 category: account
-url: https://docs.meridiandata.com/account-and-workspace
+url: /docs/account-and-workspace
 updated: 2026-08-05
 audience: all
 ---
@@ -68,7 +68,7 @@ At **Settings → Security → Domain restriction**, add one or more verified em
 
 Go to **Settings → Members**, click the member, and choose **Remove from workspace**. Their access ends immediately and any active session is terminated within 60 seconds.
 
-Removing a member does **not** break anything they built. Connections, syncs, webhooks, and API keys are owned by the workspace, not by the person who created them, so they keep running. The one exception is OAuth-based source connections authorized against that person's own account at the source system — for example, a Salesforce connection authorized with their Salesforce login. Those break with `SYNC-101` when their source-side access is revoked. Reauthorize with a service account to avoid this; see [Sources and Connectors](https://docs.meridiandata.com/connectors-sources).
+Removing a member does **not** break anything they built. Connections, syncs, webhooks, and API keys are owned by the workspace, not by the person who created them, so they keep running. The one exception is OAuth-based source connections authorized against that person's own account at the source system — for example, a Salesforce connection authorized with their Salesforce login. Those break with `SYNC-101` when their source-side access is revoked. Reauthorize with a service account to avoid this; see [Sources and Connectors](/docs/connectors-sources).
 
 ## Transferring ownership
 
@@ -101,7 +101,7 @@ At **Account settings** (click your avatar, top right):
 - **Name and avatar** — cosmetic, shown in audit logs and member lists.
 - **Email address** — changing it sends a confirmation link to the new address. The change applies only after you click that link. If your workspace uses SSO, your email is managed by your identity provider and cannot be changed here.
 - **Password** — requires your current password. Changing it signs out all other sessions.
-- **MFA** — see [Authentication and SSO](https://docs.meridiandata.com/authentication-and-sso).
+- **MFA** — see [Authentication and SSO](/docs/authentication-and-sso).
 - **Active sessions** — lists every signed-in browser with its last-used time, approximate location, and device. Revoke any of them individually, or click **Sign out everywhere**.
 
 ## Leaving a workspace

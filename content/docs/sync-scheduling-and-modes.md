@@ -2,7 +2,7 @@
 title: Sync Modes and Scheduling
 slug: sync-scheduling-and-modes
 category: syncs
-url: https://docs.meridiandata.com/sync-scheduling-and-modes
+url: /docs/sync-scheduling-and-modes
 updated: 2026-08-25
 audience: engineer
 ---
@@ -91,7 +91,7 @@ This is the best mode available, for four reasons:
 - **Every intermediate change is seen**, so a row updated and then reverted is not silently missed.
 - **MAR is minimal**, because only genuine changes are read.
 
-CDC requires **Growth or above** and server-side configuration, described per source in [Sources and Connectors](https://docs.meridiandata.com/connectors-sources).
+CDC requires **Growth or above** and server-side configuration, described per source in [Sources and Connectors](/docs/connectors-sources).
 
 ### Operational realities of CDC
 
@@ -101,7 +101,7 @@ Set retention to at least 7 days on every CDC source.
 
 **Postgres replication slots retain WAL until consumed.** A slot with nothing reading it makes Postgres keep WAL segments indefinitely, which fills the disk and takes the database down. This is the single most damaging CDC failure mode. If you pause a Postgres CDC sync for more than a day, either monitor slot lag or drop the slot and plan to resync. Set `max_slot_wal_keep_size` as a safety net.
 
-**Schema changes flow through the log.** A DDL statement appears in the change stream, and Meridian applies compatible changes automatically. Incompatible ones stop the sync with `SYNC-301` or `SYNC-303`. See the schema change table in [Destinations](https://docs.meridiandata.com/destinations).
+**Schema changes flow through the log.** A DDL statement appears in the change stream, and Meridian applies compatible changes automatically. Incompatible ones stop the sync with `SYNC-301` or `SYNC-303`. See the schema change table in [Destinations](/docs/destinations).
 
 ### Change history mode
 

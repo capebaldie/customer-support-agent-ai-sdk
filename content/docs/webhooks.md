@@ -2,7 +2,7 @@
 title: Webhooks
 slug: webhooks
 category: developer
-url: https://docs.meridiandata.com/webhooks
+url: /docs/webhooks
 updated: 2026-08-22
 audience: developer
 ---
@@ -182,7 +182,7 @@ Bulk replay every failed delivery in a time range with **Replay failed**. Useful
 
 ## Static egress IPs
 
-Webhook deliveries originate from the same static IPs listed in [Getting Started](https://docs.meridiandata.com/getting-started), so you can allowlist them at your edge. Signature verification is still required — IP allowlisting is defense in depth, not authentication.
+Webhook deliveries originate from the same static IPs listed in [Getting Started](/docs/getting-started), so you can allowlist them at your edge. Signature verification is still required — IP allowlisting is defense in depth, not authentication.
 
 ## Alternatives to webhooks
 

@@ -2,7 +2,7 @@
 title: Troubleshooting Sync Failures
 slug: troubleshooting-sync-failures
 category: troubleshooting
-url: https://docs.meridiandata.com/troubleshooting-sync-failures
+url: /docs/troubleshooting-sync-failures
 updated: 2026-09-03
 audience: engineer
 ---
@@ -20,7 +20,7 @@ Codes are grouped by where the problem is:
 | `SYNC-3xx` | Schema — structure mismatches between source and destination |
 | `SYNC-4xx` | Limits — plan quotas, durations, concurrency |
 
-For REST API request errors rather than sync run failures, see [API Error Codes](https://docs.meridiandata.com/api-error-codes).
+For REST API request errors rather than sync run failures, see [API Error Codes](/docs/api-error-codes).
 
 ## Where to look first
 
@@ -51,7 +51,7 @@ Meridian could not open a network connection at all. This is a network problem, 
 
 Check in order:
 
-1. **Firewall.** Are Meridian's egress IPs for your region allowlisted? They are listed in [Getting Started](https://docs.meridiandata.com/getting-started). Somebody tightening a security group is the most common cause of a connection that worked yesterday.
+1. **Firewall.** Are Meridian's egress IPs for your region allowlisted? They are listed in [Getting Started](/docs/getting-started). Somebody tightening a security group is the most common cause of a connection that worked yesterday.
 2. **Host and port.** Verify from outside your network, not from a machine inside the VPC where it will always work.
 3. **The database is down or failed over.** Check the source itself.
 4. **DNS.** A hostname that resolves internally but not publicly fails here.
@@ -133,7 +133,7 @@ Authentication worked; the role cannot do what Meridian needs. This is the most 
 
 Meridian needs `CREATE TABLE` in its schema, not just `SELECT` and `INSERT`. It creates tables on first sync and alters them when the source schema changes.
 
-The message names the exact missing privilege. Full grant scripts per warehouse are in [Destinations](https://docs.meridiandata.com/destinations).
+The message names the exact missing privilege. Full grant scripts per warehouse are in [Destinations](/docs/destinations).
 
 Watch for grants that cover existing objects but not future ones. In Snowflake you need `GRANT ALL ON FUTURE TABLES IN SCHEMA ...`; without it, the first sync succeeds and the second fails.
 
@@ -302,4 +302,4 @@ Include these four things and support can usually answer in one round trip inste
 3. **When it last worked** and what changed around then.
 4. What you have already tried.
 
-Email support@meridiandata.com, or use in-app chat on Scale and above. Response times by plan and severity are in [Support and SLA](https://docs.meridiandata.com/support-and-sla).
+Email support@meridiandata.com, or use in-app chat on Scale and above. Response times by plan and severity are in [Support and SLA](/docs/support-and-sla).

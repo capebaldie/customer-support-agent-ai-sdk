@@ -1,0 +1,6 @@
+# A raw NUL byte in a source file makes git classify it as binary, and every diff of it renders as
+# "Binary files differ" — including on GitHub, which reads this file. scripts/ingest.ts carried one
+# for its whole history, so the script that writes to the chunks table was never reviewable in a
+# pull request. The byte is gone, but the attribute keeps a future one from silently doing it again.
+*.ts diff
+*.tsx diff

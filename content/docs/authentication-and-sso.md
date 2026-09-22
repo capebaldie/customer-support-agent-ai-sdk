@@ -2,7 +2,7 @@
 title: Authentication, MFA, and SSO
 slug: authentication-and-sso
 category: security
-url: https://docs.meridiandata.com/authentication-and-sso
+url: /docs/authentication-and-sso
 updated: 2026-06-19
 audience: admin
 ---
@@ -161,7 +161,7 @@ Configure at **Settings → Security → Session policy**. Shortening a lifetime
 
 ## API keys
 
-API keys authenticate to the REST API and are independent of user sign-in. Full details are in the [API Reference](https://docs.meridiandata.com/api-reference). The short version:
+API keys authenticate to the REST API and are independent of user sign-in. Full details are in the [API Reference](/docs/api-reference). The short version:
 
 - Keys belong to the workspace, not the person who made them, and survive that person leaving.
 - The secret is shown **once**, at creation. Meridian stores only a hash. If you lose it, rotate the key.

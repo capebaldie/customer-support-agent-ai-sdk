@@ -2,7 +2,7 @@
 title: REST API Reference
 slug: api-reference
 category: developer
-url: https://docs.meridiandata.com/api-reference
+url: /docs/api-reference
 updated: 2026-09-01
 audience: developer
 ---
@@ -226,11 +226,11 @@ Usage figures for the current month are updated every 15 minutes and are provisi
 
 ## Webhooks
 
-Webhook endpoints are managed through `/v1/webhooks` and documented separately in [Webhooks](https://docs.meridiandata.com/webhooks).
+Webhook endpoints are managed through `/v1/webhooks` and documented separately in [Webhooks](/docs/webhooks).
 
 ## Errors
 
-Every error returns a JSON body with a stable machine-readable `code`. The full list is in [API Error Codes](https://docs.meridiandata.com/api-error-codes). Branch on `code`, never on the human-readable `message`, which may be reworded at any time.
+Every error returns a JSON body with a stable machine-readable `code`. The full list is in [API Error Codes](/docs/api-error-codes). Branch on `code`, never on the human-readable `message`, which may be reworded at any time.
 
 ## Client libraries
 

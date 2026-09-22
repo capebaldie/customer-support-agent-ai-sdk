@@ -2,7 +2,7 @@
 title: Limits and Quotas
 slug: limits-and-quotas
 category: reference
-url: https://docs.meridiandata.com/limits-and-quotas
+url: /docs/limits-and-quotas
 updated: 2026-08-29
 audience: all
 ---
@@ -128,7 +128,7 @@ Restated here because it is the limit that matters most. A MAR is one distinct p
 - Synced to two destinations → **2 MAR**
 - Counter resets on the 1st at 00:00 UTC
 
-Full detail and worked examples are in [Plans and Pricing](https://docs.meridiandata.com/plans-and-pricing).
+Full detail and worked examples are in [Plans and Pricing](/docs/plans-and-pricing).
 
 ## Requesting a limit increase
 

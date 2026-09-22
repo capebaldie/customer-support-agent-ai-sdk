@@ -2,7 +2,7 @@
 title: Sources and Connectors
 slug: connectors-sources
 category: connectors
-url: https://docs.meridiandata.com/connectors-sources
+url: /docs/connectors-sources
 updated: 2026-08-18
 audience: engineer
 ---
@@ -197,7 +197,7 @@ Three options, in descending order of preference.
 
 ### 1. IP allowlisting
 
-Simplest. Open your firewall to Meridian's static egress IPs for your region — listed in [Getting Started](https://docs.meridiandata.com/getting-started) — and require TLS.
+Simplest. Open your firewall to Meridian's static egress IPs for your region — listed in [Getting Started](/docs/getting-started) — and require TLS.
 
 ### 2. SSH tunnel
 

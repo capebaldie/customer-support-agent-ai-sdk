@@ -2,14 +2,14 @@
 title: Billing, Invoices, and Payments
 slug: billing-and-invoices
 category: billing
-url: https://docs.meridiandata.com/billing-and-invoices
+url: /docs/billing-and-invoices
 updated: 2026-07-30
 audience: all
 ---
 
 # Billing, Invoices, and Payments
 
-This page covers how Meridian charges you, how to change payment details, and what happens when a payment fails. For what each plan costs and how usage is counted, see [Plans and Pricing](https://docs.meridiandata.com/plans-and-pricing).
+This page covers how Meridian charges you, how to change payment details, and what happens when a payment fails. For what each plan costs and how usage is counted, see [Plans and Pricing](/docs/plans-and-pricing).
 
 ## Who can manage billing
 
@@ -57,7 +57,7 @@ Find every invoice at **Settings → Billing → Invoices**. Each row links to a
 
 Click **View usage** on any invoice to see MAR attributed per sync, per table, and per destination for that period. This is the fastest way to answer "why was this month expensive" — sort by MAR descending and the culprit is almost always at the top.
 
-Usage data is also available from the API at `GET /v1/usage`. See the [API Reference](https://docs.meridiandata.com/api-reference).
+Usage data is also available from the API at `GET /v1/usage`. See the [API Reference](/docs/api-reference).
 
 ## Tax
 
@@ -86,14 +86,14 @@ When a charge fails, Meridian retries on a fixed schedule and emails the Owner a
 
 Nothing is deleted from your destination warehouse at any point — that data is in your infrastructure and Meridian never removes it.
 
-To recover at any stage before day 90, add a working payment method and click **Retry payment now**. Syncs resume within 5 minutes. Data that changed at the source while syncs were paused is picked up on the next run; CDC tables may need a resync if the pause outlasted your source's log retention (see `SYNC-105` in [Troubleshooting Sync Failures](https://docs.meridiandata.com/troubleshooting-sync-failures)).
+To recover at any stage before day 90, add a working payment method and click **Retry payment now**. Syncs resume within 5 minutes. Data that changed at the source while syncs were paused is picked up on the next run; CDC tables may need a resync if the pause outlasted your source's log retention (see `SYNC-105` in [Troubleshooting Sync Failures](/docs/troubleshooting-sync-failures)).
 
 ## Refunds and credits
 
 - **Monthly plans** are not refunded for partial months. Cancel and you keep access until the period ends.
 - **Annual plans** are refundable on a prorated basis within the first 30 days. After 30 days, annual fees are non-refundable except where a contract says otherwise.
 - **Overage disputes** — if you believe a MAR figure is wrong, email support@meridiandata.com with the invoice number within 60 days. Meridian reviews the sync logs behind the number and issues a credit if the charge was incorrect.
-- **SLA credits** for missed uptime commitments are described in [Support and SLA](https://docs.meridiandata.com/support-and-sla). They are issued as account credit, not cash, and must be requested within 30 days of the incident.
+- **SLA credits** for missed uptime commitments are described in [Support and SLA](/docs/support-and-sla). They are issued as account credit, not cash, and must be requested within 30 days of the incident.
 
 Account credit is applied automatically against the next invoice and never expires.
 
@@ -108,4 +108,4 @@ On cancellation:
 - A final invoice covering any outstanding overage is issued within 24 hours of the period ending.
 - Configuration is retained for 90 days on Starter, so reactivating later restores everything.
 
-To delete the workspace entirely rather than downgrade it, see [Account and Workspace Management](https://docs.meridiandata.com/account-and-workspace).
+To delete the workspace entirely rather than downgrade it, see [Account and Workspace Management](/docs/account-and-workspace).

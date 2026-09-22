@@ -2,7 +2,7 @@
 title: Plans and Pricing
 slug: plans-and-pricing
 category: billing
-url: https://docs.meridiandata.com/plans-and-pricing
+url: /docs/plans-and-pricing
 updated: 2026-08-28
 audience: all
 ---

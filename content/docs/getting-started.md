@@ -2,7 +2,7 @@
 title: Getting Started with Meridian Sync
 slug: getting-started
 category: onboarding
-url: https://docs.meridiandata.com/getting-started
+url: /docs/getting-started
 updated: 2026-08-14
 audience: all
 ---
@@ -29,17 +29,17 @@ A **workspace** is the top-level container for everything you build: connections
 
 When you sign up you are prompted to name your first workspace. Pick something that matches how you will bill, because **usage and invoices are tracked per workspace, not per account**. You can rename a workspace at any time from **Settings → General**.
 
-Your account is automatically assigned the **Owner** role in the workspace you create. See [Account and Workspace Management](https://docs.meridiandata.com/account-and-workspace) for the full role list.
+Your account is automatically assigned the **Owner** role in the workspace you create. See [Account and Workspace Management](/docs/account-and-workspace) for the full role list.
 
 ## Step 2: Connect a source
 
 1. In the left sidebar, click **Connections → New connection → Source**.
-2. Pick your source type from the catalog. Meridian supports PostgreSQL, MySQL, MongoDB, Stripe, Salesforce, Shopify, HubSpot, Google Ads, Zendesk, Intercom, Amazon S3, and NetSuite. See [Sources and Connectors](https://docs.meridiandata.com/connectors-sources) for setup notes on each.
+2. Pick your source type from the catalog. Meridian supports PostgreSQL, MySQL, MongoDB, Stripe, Salesforce, Shopify, HubSpot, Google Ads, Zendesk, Intercom, Amazon S3, and NetSuite. See [Sources and Connectors](/docs/connectors-sources) for setup notes on each.
 3. Enter credentials. Database sources ask for host, port, database, username, and password. SaaS sources open an OAuth window instead.
 4. Click **Test connection**. Meridian opens a connection, lists the tables or objects it can see, and reports back. This usually takes under 10 seconds.
 5. Click **Save**.
 
-If the test fails, the error banner names a `SYNC-1xx` code. The two most common are `SYNC-101` (bad credentials) and `SYNC-102` (Meridian cannot reach the host, almost always a firewall). [Troubleshooting Sync Failures](https://docs.meridiandata.com/troubleshooting-sync-failures) lists every code and its fix.
+If the test fails, the error banner names a `SYNC-1xx` code. The two most common are `SYNC-101` (bad credentials) and `SYNC-102` (Meridian cannot reach the host, almost always a firewall). [Troubleshooting Sync Failures](/docs/troubleshooting-sync-failures) lists every code and its fix.
 
 ### Allowlisting Meridian's IP addresses
 
@@ -51,7 +51,7 @@ If your database sits behind a firewall, allow inbound connections from Meridian
 | `eu-west` | `18.203.44.10`, `18.203.44.11`, `18.203.44.12` |
 | `ap-southeast` | `13.55.201.88`, `13.55.201.89`, `13.55.201.90` |
 
-These addresses are stable and Meridian gives 30 days' notice by email before changing them. If you cannot open a firewall, use an SSH tunnel or a reverse tunnel instead — both are described in [Sources and Connectors](https://docs.meridiandata.com/connectors-sources).
+These addresses are stable and Meridian gives 30 days' notice by email before changing them. If you cannot open a firewall, use an SSH tunnel or a reverse tunnel instead — both are described in [Sources and Connectors](/docs/connectors-sources).
 
 ## Step 3: Connect a destination
 
@@ -59,7 +59,7 @@ Click **Connections → New connection → Destination** and pick your warehouse
 
 Every destination needs a schema or dataset that Meridian owns and a role with permission to create and modify tables inside it. Do not point Meridian at a schema your analysts also write to by hand — Meridian will alter tables to match the source schema, and hand-made changes to those tables will be overwritten.
 
-The exact grants for each warehouse are listed in [Destinations](https://docs.meridiandata.com/destinations). The most common first-sync failure is `SYNC-202`, a destination role that can read but cannot create tables.
+The exact grants for each warehouse are listed in [Destinations](/docs/destinations). The most common first-sync failure is `SYNC-202`, a destination role that can read but cannot create tables.
 
 ## Step 4: Create a sync
 
@@ -68,7 +68,7 @@ A **sync** is a pairing of one source and one destination, plus the set of table
 1. Click **Syncs → New sync**.
 2. Choose your source connection and your destination connection.
 3. Select tables. Meridian shows every table it can read, with an estimated row count next to each. **Select only what you need** — every synced row counts toward your Monthly Active Rows, and unused tables are the single most common cause of a surprise bill.
-4. Choose a sync mode per table. Meridian preselects the best available mode: log-based CDC where the source supports it, incremental where a usable cursor column exists, and full refresh otherwise. See [Sync Modes and Scheduling](https://docs.meridiandata.com/sync-scheduling-and-modes).
+4. Choose a sync mode per table. Meridian preselects the best available mode: log-based CDC where the source supports it, incremental where a usable cursor column exists, and full refresh otherwise. See [Sync Modes and Scheduling](/docs/sync-scheduling-and-modes).
 5. Choose a schedule. The minimum interval depends on your plan: 24 hours on Starter, 1 hour on Growth, 15 minutes on Scale, and 5 minutes on Enterprise.
 6. Click **Create sync**.
 
@@ -82,7 +82,7 @@ Watch progress on the sync detail page. Each table moves through `queued → ext
 
 ### Understanding your first bill
 
-The backfill counts toward Monthly Active Rows in the month it runs. A 4 million row backfill on the Growth plan consumes 4 million of your 5 million included MAR immediately. This is expected, and it is why the second month's bill is usually much lower than the first. See [Plans and Pricing](https://docs.meridiandata.com/plans-and-pricing) for how MAR is counted.
+The backfill counts toward Monthly Active Rows in the month it runs. A 4 million row backfill on the Growth plan consumes 4 million of your 5 million included MAR immediately. This is expected, and it is why the second month's bill is usually much lower than the first. See [Plans and Pricing](/docs/plans-and-pricing) for how MAR is counted.
 
 ## Step 6: Verify the data
 
@@ -105,10 +105,10 @@ Filter out `_meridian_deleted = true` in your queries unless you specifically wa
 
 ## What to do next
 
-- Set up alerting so you hear about failures before your analysts do. Go to **Settings → Notifications** and add an email address or Slack channel for `sync.failed` and `connection.broken`. Programmatic alerting is covered in [Webhooks](https://docs.meridiandata.com/webhooks).
+- Set up alerting so you hear about failures before your analysts do. Go to **Settings → Notifications** and add an email address or Slack channel for `sync.failed` and `connection.broken`. Programmatic alerting is covered in [Webhooks](/docs/webhooks).
 - Invite your team from **Settings → Members**. Grant the narrowest role that works; `Analyst` is enough for someone who only reads sync status.
 - Set a usage alert at **Settings → Billing → Usage alerts** so you are emailed at 80% of your included MAR.
 
 ## Getting help
 
-Email support@meridiandata.com or use in-app chat if your plan includes it. Response times by plan are listed in [Support and SLA](https://docs.meridiandata.com/support-and-sla). Live incidents are posted at [status.meridiandata.com](https://status.meridiandata.com).
+Email support@meridiandata.com or use in-app chat if your plan includes it. Response times by plan are listed in [Support and SLA](/docs/support-and-sla). Live incidents are posted at [status.meridiandata.com](https://status.meridiandata.com).

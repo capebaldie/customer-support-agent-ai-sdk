@@ -17,7 +17,7 @@ export type Chunk = {
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
 
 // values contain colons (`url: https://...`), so split on the first one only
-function parseFrontmatter(source: string) {
+export function parseFrontmatter(source: string) {
   // exec returns null if no match, or an array of matches if it does. The first element is the whole match, the second is the first capture group.
   const match = FRONTMATTER.exec(source);
   if (!match) throw new Error("document has no frontmatter");

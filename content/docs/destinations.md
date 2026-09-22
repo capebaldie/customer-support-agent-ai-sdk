@@ -2,7 +2,7 @@
 title: Destinations
 slug: destinations
 category: connectors
-url: https://docs.meridiandata.com/destinations
+url: /docs/destinations
 updated: 2026-08-11
 audience: engineer
 ---
@@ -226,7 +226,7 @@ Meridian propagates source schema changes automatically:
 | Table dropped at source | Table retained in the destination, sync continues, warning raised |
 | Primary key changed | Fails with `SYNC-301`, needs a full resync |
 
-Subscribe to the `schema.changed` and `schema.change_blocked` webhooks to catch these before your dashboards do. See [Webhooks](https://docs.meridiandata.com/webhooks).
+Subscribe to the `schema.changed` and `schema.change_blocked` webhooks to catch these before your dashboards do. See [Webhooks](/docs/webhooks).
 
 ## Changing destinations
 
