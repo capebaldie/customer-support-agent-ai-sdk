@@ -14,6 +14,7 @@ import { readFileSync } from "node:fs";
 type Hit = { rank: number | null; topSimilarity: number; top: string | null };
 type Metrics = { n: number; recallAt1: number; recallAt5: number; mrr: number };
 type Baseline = {
+  k: number;
   raw: Metrics;
   rephrased: Metrics | null;
   stale?: string;
@@ -73,6 +74,13 @@ for (const r of next.results) {
   }
 }
 if (moved.length) lines.push("", "**Rank changes**", ...moved);
+
+// Absolute state, not a diff: on the first run there is no base to compare against, and a question
+// that has been failing for weeks never appears in `moved` at all.
+const missing = next.results
+  .filter((r) => r.expectedSlug !== null && (["raw", "rephrased"] as const).some((c) => r[c] && r[c]!.rank === null))
+  .map((r) => `- \`${r.question}\`\n  got: ${r.raw.top}`);
+if (missing.length) lines.push("", `**Not found in the top ${next.k} at all** (${missing.length})`, ...missing);
 
 console.log(lines.join("\n"));
 
