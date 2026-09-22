@@ -5,6 +5,18 @@ name: Delete Neon branch
 on:
   pull_request:
     types: [closed]
+    # Must stay identical to retrieval.yml's filter. A path that runs the eval but not this job
+    # leaks a Neon branch on every PR; GitHub Actions has no way to share the list between files.
+    paths:
+      - 'content/docs/**'
+      - 'lib/db/**'
+      - 'lib/rag/chunk.ts'
+      - 'lib/rag/embedding.ts'
+      - 'lib/rag/search.ts'
+      - 'eval/questions.ts'
+      - 'eval/search-queries.json'
+      - 'scripts/ingest.ts'
+      - 'scripts/eval.ts'
 
 jobs:
   delete:
