@@ -8,6 +8,9 @@ on:
     # GitHub Actions does not support YAML anchors, so this list is repeated below
     paths:
       - 'content/docs/**'
+      # schema and migrations: db:migrate below is the only thing that applies them to
+      # production, and a migration PR touches no other path here
+      - 'lib/db/**'
       # no docs change, but it moves every chunk boundary in the corpus — the largest blast radius
       # in the repo behind the smallest diff
       - 'lib/rag/chunk.ts'
@@ -21,6 +24,9 @@ on:
     branches: [main]
     paths:
       - 'content/docs/**'
+      # schema and migrations: db:migrate below is the only thing that applies them to
+      # production, and a migration PR touches no other path here
+      - 'lib/db/**'
       # no docs change, but it moves every chunk boundary in the corpus — the largest blast radius
       # in the repo behind the smallest diff
       - 'lib/rag/chunk.ts'
