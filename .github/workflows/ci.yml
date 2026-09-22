@@ -31,8 +31,10 @@ jobs:
       - run: pnpm lint
       - run: pnpm build
 
-      # The chunker decides every chunk boundary, so it is upstream of every embedding. Costs nothing.
-      - run: node --test lib/rag/*.test.ts
+      # Quoted so node expands it, not bash: node's own glob handles `**`, bash's does not without
+      # globstar, and a bare directory argument makes the runner try to import it. Nothing here
+      # touches the database or an API.
+      - run: node --test "lib/**/*.test.ts"
 
       # Fails if eval/search-queries.json was captured under a different prompt than lib/rag/prompt.ts.
       # No database and no API calls, so it also runs on fork PRs. See the script for the way out.

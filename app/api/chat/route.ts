@@ -16,6 +16,7 @@ import { retrievals } from "@/lib/db/schema";
 import { TEXT_MODEL } from "@/lib/rag/embedding";
 import { INSTRUCTIONS, SEARCH_TOOL } from "@/lib/rag/prompt";
 import { search } from "@/lib/rag/search";
+import { rateLimit } from "@/lib/rate-limit";
 
 const K = 5;
 
@@ -27,7 +28,18 @@ const K = 5;
 // off-topic. Deciding whether the sections answer the question is the prompt's job, not this number's.
 const MIN_SIMILARITY = 0.6;
 
+// Gemini's free tier is 5 requests a minute, shared by everyone hitting this deployment. Matching
+// that per caller means one client can reach the ceiling but cannot hold it there. It does not
+// protect the separate 20/day cap — four minutes of one determined caller still spends the day.
+const LIMIT = 5;
+const WINDOW_MS = 60_000;
+
 export async function POST(req: Request) {
+  // before parsing the body or touching the model: the point is to spend nothing on a caller
+  // that is already over
+  const limited = rateLimit(req, "chat", LIMIT, WINDOW_MS);
+  if (limited) return limited;
+
   // message variable contains history of the chat
   const { messages }: { messages: UIMessage[] } = await req.json();
 

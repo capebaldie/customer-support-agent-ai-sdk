@@ -562,6 +562,11 @@ Each of these waits for the eval number to justify it, or for a real user to ask
   covered case already works and `scripts/check-multipart.ts` guards it.
 - **Conversation persistence.**
 - **Better Auth + account-lookup tools.** When built: the user id comes from the **server session**, never as a tool parameter — a model-supplied `userId` is an attacker-influenced input and turns into a data-exfiltration path.
-- **Rate limiting.**
+- **Rate limiting that survives more than one instance.** `lib/rate-limit.ts` caps a caller at 5 chat
+  requests a minute and 30 feedback writes, keyed on the last `x-forwarded-for` entry — the only one
+  a caller cannot forge. Two gaps stay open deliberately: the counter is a module-scope `Map`, so the
+  real ceiling is (instances × limit) and a cold start forgets everything, and nothing guards
+  Gemini's separate **20/day** cap, which four minutes of one determined caller still spends. Both
+  need shared state; reach for Vercel's limiter or Upstash when a deployment sees real traffic.
 - **An ops dashboard at `/admin`** — ingestion run history, reindex buttons, the thumbs-down queue, eval scores over time. Build it when someone who cannot run `pnpm` needs to operate this. Until then Task 10's query and a terminal do the same job. It is an ops surface, never a content editor.
 - **Moving docs out of git.** The trigger is not technical: it is the first time someone who does not use git says "that doc is wrong, can you fix it." Docs going stale is the real failure mode of a support agent, and no amount of retrieval quality compensates for it. When that day comes, put the corpus in an existing CMS or help center rather than building one, and keep the change contained to a `fetchDocuments() => Document[]` boundary in front of Task 4 — one implementation reading the filesystem today, another reading an API later. Task 3 gets replaced along with it: a CMS stores a rich-text tree, not markdown with `##` headings.
