@@ -11,6 +11,14 @@
 //
 // Deleting eval/search-queries.json is the deliberate way out. That passes: scripts/eval.ts already
 // falls back to scoring the raw column alone. Skipping the check has to be a choice, not an accident.
+//
+// Third way out, for a prompt edit that cannot reach the first tool call — a citation or formatting
+// rule the model only applies once a tool result exists: overwrite the file's `prompt` field and
+// keep the queries. Earn it first. The capture is a sampled call with no temperature pinned, so
+// re-running one question is not evidence: run a sample under both the old and the new prompt and
+// compare each against the committed file. The citation-url rule scored 2/6 identical either way,
+// same two questions, so the drift was the sampler, not the edit. A control that comes back cleaner
+// on the old prompt means the edit did move the queries, and then it is recapture or nothing.
 import { readFileSync } from "node:fs";
 import { INSTRUCTIONS, SEARCH_TOOL } from "../lib/rag/prompt.ts";
 

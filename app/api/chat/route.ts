@@ -97,7 +97,16 @@ export async function POST(req: Request) {
           return {
             escalate: false,
             topSimilarity: results[0].similarity,
-            results,
+            // The model kept citing https://docs.meridiansync.com/docs/... — a host that appears
+            // nowhere in the corpus. Asked for a markdown link built from url + docTitle +
+            // headingPath, it treats a bare `/docs/x` as an incomplete link and invents a plausible
+            // host for the product named in the prompt. Two rounds of forbidding that in
+            // INSTRUCTIONS each stopped one spelling and produced another. So hand over the
+            // finished string: pasting is not composing, and there is no gap left to fill.
+            results: results.map((r) => ({
+              ...r,
+              citation: `[${[r.docTitle, r.headingPath].filter(Boolean).join(" > ")}](${r.url})`,
+            })),
           };
         },
       }),
