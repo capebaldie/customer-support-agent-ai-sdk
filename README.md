@@ -1,8 +1,16 @@
 # Support Agent
 
-A RAG-based customer support agent built with the [Vercel AI SDK](https://ai-sdk.dev) and Next.js.
+A production-grade, RAG-based customer support agent built with the [Vercel AI SDK](https://ai-sdk.dev) and Next.js.
 
 It answers questions about a fictional product — **Meridian Sync**, a managed data-pipeline SaaS — from a knowledge base of support docs in [`content/docs/`](content/docs/). The docs are invented, but they are written like real ones: consistent plan limits, a full error-code reference, and deliberately similar topics that retrieval has to tell apart.
+
+### Highlights
+
+- **Interactive in-app citations**: Answers cite exact sections, linking directly to rendered docs at `/docs/[slug]`.
+- **Proactive follow-up suggestions**: Contextually suggests the next 2–3 questions a user might ask based on cited documentation.
+- **Diagnostic feedback capture**: Thumbs-down dialog records feedback comments to distinguish retrieval misses from prompt/reasoning failures.
+- **Measured retrieval**: Evaluated against a 39-question golden test set tracking `recall@1`, `recall@5`, and `MRR`.
+- **Quota & cost guards**: Built-in per-caller rate-limiting and hash-based incremental diff re-indexing.
 
 ## Stack
 
@@ -10,7 +18,7 @@ It answers questions about a fictional product — **Meridian Sync**, a managed 
 | ---------- | ----------------------------------------- |
 | Framework  | Next.js 16 (App Router)                   |
 | AI         | Vercel AI SDK v7                          |
-| Chat model | `gemini-3.5-flash`                        |
+| Chat model | `gemini-3.5-flash-lite`                   |
 | Embeddings | `gemini-embedding-001` at 1536 dimensions |
 | Database   | Neon Postgres + pgvector                  |
 | ORM        | Drizzle                                   |
@@ -69,20 +77,34 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 app/
-  api/chat/route.ts    chat endpoint — streaming, agentic tool loop
-  page.tsx             chat UI
-content/docs/          the knowledge base: 15 markdown docs
+  api/
+    chat/route.ts        chat endpoint — streaming, agentic tool loop
+    feedback/route.ts    feedback endpoint — thumbs up/down and diagnostic comments
+    followups/route.ts   suggests follow-up questions from cited sections
+  _components/chat/      chat UI components (thread, composer, suggestions, feedback dialog)
+  docs/                  in-app doc browser (/docs and /docs/[slug])
+  page.tsx               chat page
+content/docs/            the knowledge base: 15 markdown docs
+eval/
+  baseline.json          recall@1, recall@5, and MRR baseline scores
+  questions.ts           39 representative questions with expected targets
 lib/
   db/
-    schema.ts          drizzle schema — chunks table, pgvector HNSW index
-    migrations/        generated SQL, applied in order by `pnpm db:migrate`
+    schema.ts            drizzle schema — chunks & retrievals tables, pgvector HNSW index
+    migrations/          generated SQL, applied in order by `pnpm db:migrate`
   rag/
-    chunk.ts           splits docs into heading sections with breadcrumbs
-    chunk.test.ts      node --test lib/rag/chunk.test.ts
-  env.ts               env var validation (zod)
+    chunk.ts             splits docs into heading sections with breadcrumbs
+    chunk.test.ts        node --test lib/rag/chunk.test.ts
+    embedding.ts         model constants and embedding dimensions
+    prompt.ts            system prompt and search tool definition
+    search.ts            vector cosine similarity search
+  env.ts                 env var validation (zod)
+  rate-limit.ts          per-caller IP rate limiting on API routes
 scripts/
-  ingest.ts            chunk + embed + upsert, run by `pnpm db:ingest`
-instrumentation.ts     runs the env check once, before the server serves
+  ingest.ts              chunk + embed + upsert, run by `pnpm db:ingest`
+  eval.ts                evaluates retrieval against eval/questions.ts
+  rephrase.ts            captures model search queries for eval
+instrumentation.ts       runs the env check once, before the server serves
 ```
 
 ## Database migrations
@@ -145,12 +167,13 @@ then stale in a way no hash can detect, since the input text never moved.
 Every `searchKnowledgeBase` call writes a row to `retrievals`: the query, the chunk ids and scores it
 returned, `k`, latency, model, and the answer's token counts. The row is written with Next's
 `after()`, once the response has finished streaming, so logging never slows or breaks an answer.
-The 👍/👎 under an answer sets `feedback` on every search row of that message.
+The 👍/👎 under an answer sets `feedback` on every search row of that message; down-votes open
+a dialog capturing an optional diagnostic `comment` (distinguishing retrieval misses from ignored context).
 
 Thumbs-down answers with what they retrieved, newest first (Neon SQL editor or `psql`):
 
 ```sql
-select r."createdAt", r.query, r.scores,
+select r."createdAt", r.query, r.comment, r.scores,
        array_agg(coalesce(c."docSlug" || ' > ' || c."headingPath", '(chunk ' || ids.id || ' since deleted)')
                  order by ids.ord) as retrieved
 from retrievals r
@@ -162,6 +185,19 @@ order by r."createdAt" desc;
 ```
 
 Each of these is a candidate question for `eval/questions.ts`.
+
+## Retrieval evaluation
+
+Retrieval quality is measured against 39 curated support questions in [`eval/questions.ts`](eval/questions.ts), tracking `recall@1`, `recall@5`, and `MRR` (Mean Reciprocal Rank):
+
+```bash
+pnpm eval              # scores retrieval against the golden set
+pnpm eval:rephrase     # captures the chat model's rephrased search queries
+```
+
+Scores are written to [`eval/baseline.json`](eval/baseline.json) across two columns:
+- `raw`: embeds the user question verbatim as typed.
+- `rephrased`: embeds the query the model generated for `searchKnowledgeBase` (captured via `pnpm eval:rephrase`), matching production behavior.
 
 ### Retention
 
@@ -194,6 +230,8 @@ The effect is that a bad config fails the boot instead of surfacing later as a c
 ## The knowledge base
 
 15 docs, ~2,800 lines, in [`content/docs/`](content/docs/) — onboarding, pricing, billing, account management, auth and SSO, the REST API, error codes, webhooks, connectors, destinations, sync modes, troubleshooting, limits, security, and support.
+
+The documentation is also served directly by the app at [`/docs`](http://localhost:3000/docs) and `/docs/[slug]`, so all citations in assistant answers link directly to readable in-app pages.
 
 Each has YAML frontmatter (`title`, `slug`, `category`, `url`, `updated`, `audience`) and consistent `##`/`###` heading structure, which is what the chunker splits on.
 
