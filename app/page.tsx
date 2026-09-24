@@ -72,6 +72,7 @@ export default function Chat() {
           busy={busy}
           feedback={feedback}
           onVote={vote}
+          onFollowUp={(text) => sendMessage({ text })}
         />
 
         {error && (

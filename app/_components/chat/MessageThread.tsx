@@ -6,11 +6,13 @@ export function MessageThread({
   busy,
   feedback,
   onVote,
+  onFollowUp,
 }: {
   messages: UIMessage[];
   busy: boolean;
   feedback: Record<string, "up" | "down">;
   onVote: (messageId: string, value: "up" | "down") => void;
+  onFollowUp: (question: string) => void;
 }) {
   const lastId = messages.at(-1)?.id;
 
@@ -39,6 +41,7 @@ export function MessageThread({
             isLast={message.id === lastId}
             feedbackValue={feedback[message.id]}
             onVote={onVote}
+            onFollowUp={onFollowUp}
           />
         );
       })}
