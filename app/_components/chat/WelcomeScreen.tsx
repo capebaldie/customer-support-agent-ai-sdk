@@ -59,40 +59,7 @@ export function WelcomeScreen({
 }) {
   return (
     <div className="flex flex-col items-center text-center">
-      <svg viewBox="0 0 142 86" aria-hidden className="h-[5.5rem] w-auto">
-        <g
-          stroke="currentColor"
-          strokeWidth="2.8"
-          strokeLinecap="round"
-          className="text-signal opacity-40"
-        >
-          <path d="M16 24 6 19" />
-          <path d="M22 13 17 4" />
-          <path d="M35 7 34 0" />
-          <path d="M122 22 132 18" />
-          <path d="M116 12 121 4" />
-        </g>
-        <g className="fill-signal opacity-25">
-          <rect x="76" y="28" width="54" height="38" rx="14" />
-          <path d="M96 64 90 78l16-12Z" />
-        </g>
-        <g className="fill-paper">
-          <circle cx="91" cy="47" r="2.8" />
-          <circle cx="103" cy="47" r="2.8" />
-          <circle cx="115" cy="47" r="2.8" />
-        </g>
-        <g className="fill-signal">
-          <rect x="22" y="8" width="68" height="47" rx="16" />
-          <path d="M40 53 32 70l18-13Z" />
-        </g>
-        <g className="fill-paper">
-          <circle cx="41" cy="31" r="3.6" />
-          <circle cx="56" cy="31" r="3.6" />
-          <circle cx="71" cy="31" r="3.6" />
-        </g>
-      </svg>
-
-      <h1 className="mt-6 max-w-[30ch] text-balance text-[1.875rem] leading-[1.2] font-bold tracking-[-0.02em] sm:text-[2.25rem]">
+      <h1 className="max-w-[30ch] text-balance text-[1.875rem] leading-[1.2] font-bold tracking-[-0.02em] sm:text-[2.25rem]">
         What can we help you with?
       </h1>
       <p className="mt-4 max-w-[60ch] text-[0.9375rem] leading-relaxed text-depth">
@@ -100,21 +67,21 @@ export function WelcomeScreen({
         one lists the sections it used and the date each was last changed.
       </p>
 
-      <ul className="mt-10 grid w-full gap-4 text-left sm:grid-cols-2">
+      <ul className="mt-14 grid w-full gap-4 text-left sm:grid-cols-2">
         {STARTERS.map(({ question, blurb, accent, icon }) => (
           <li key={question}>
             <button
               type="button"
               onClick={() => onSelect(question)}
-              className="group flex h-full w-full items-start gap-4 rounded-2xl border border-rule bg-vellum p-5 text-left hover:border-signal/40 hover:bg-paper"
+              className="group flex h-full w-full items-start gap-4 rounded-2xl border border-rule p-5 text-left transition-all duration-200 hover:border-edge hover:shadow-sm hover:-translate-y-0.5"
             >
               <span
                 aria-hidden
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-full"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl transition-colors duration-200"
                 style={{
                   color: accent,
                   background:
-                    "color-mix(in srgb, currentColor 13%, transparent)",
+                    "color-mix(in srgb, currentColor 10%, transparent)",
                 }}
               >
                 <svg
@@ -137,7 +104,7 @@ export function WelcomeScreen({
               </span>
               <span
                 aria-hidden
-                className="shrink-0 self-center text-depth group-hover:text-signal"
+                className="shrink-0 self-center text-depth transition-all duration-200 group-hover:text-ink group-hover:translate-x-0.5"
               >
                 →
               </span>
