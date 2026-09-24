@@ -1,13 +1,25 @@
 import { Mark } from "./icons";
 
-export function ChatHeader({ error }: { error: Error | undefined }) {
+export function ChatHeader({
+  error,
+  onReset,
+}: {
+  error: Error | undefined;
+  onReset: () => void;
+}) {
   return (
     <header className="sticky top-0 z-20 border-b border-rule bg-paper">
       <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-3 px-5">
-        <Mark />
-        <span className="text-[1.0625rem] font-bold tracking-tight">
-          Meridian Sync
-        </span>
+        <button
+          type="button"
+          onClick={onReset}
+          className="flex items-center gap-3"
+        >
+          <Mark />
+          <span className="text-[1.0625rem] font-bold tracking-tight">
+            Meridian Sync
+          </span>
+        </button>
         <span aria-hidden className="h-5 w-px bg-rule" />
         <span className="text-[0.9375rem] text-depth">Support</span>
 

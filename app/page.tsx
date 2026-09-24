@@ -10,7 +10,7 @@ import { MessageThread } from "./_components/chat/MessageThread";
 import { WelcomeScreen } from "./_components/chat/WelcomeScreen";
 
 export default function Chat() {
-  const { messages, sendMessage, status, error, stop } = useChat();
+  const { messages, setMessages, sendMessage, status, error, stop } = useChat();
   // "error" stays enabled so the user can retry; otherwise the form would lock after one failure
   const busy = status === "submitted" || status === "streaming";
   const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
@@ -23,10 +23,11 @@ export default function Chat() {
   // The guard is what stops it hijacking the page when someone has scrolled up to re-read
   // something earlier: by the time the effect runs the DOM has already grown, but only by the
   // size of one chunk, so a reader still pinned to the bottom stays well inside the margin.
+  // The 400px threshold accounts for pb-32 padding + sticky composer height.
   useEffect(() => {
     const nearBottom =
-      window.innerHeight + window.scrollY >= document.body.scrollHeight - 200;
-    if (nearBottom) endRef.current?.scrollIntoView({ block: "end" });
+      window.innerHeight + window.scrollY >= document.body.scrollHeight - 400;
+    if (nearBottom) endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages]);
 
   function sendFeedback(
@@ -41,7 +42,7 @@ export default function Chat() {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ messageId, feedback: value, comment }),
-    }).catch(() => {});
+    }).catch(() => { });
   }
 
   function vote(messageId: string, value: "up" | "down") {
@@ -53,36 +54,12 @@ export default function Chat() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Decoration only. The dot fields are a CSS gradient rather than an asset, and the band at
-          the bottom is what the composer sits on. */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-x-0 bottom-0 h-[55vh] bg-gradient-to-t from-wash via-wash/60 to-transparent" />
-        <div
-          className="absolute top-[34%] left-4 hidden h-28 w-28 opacity-70 lg:block"
-          style={{
-            backgroundImage:
-              "radial-gradient(var(--rule) 1.6px, transparent 1.6px)",
-            backgroundSize: "15px 15px",
-          }}
-        />
-        <div
-          className="absolute top-[42%] right-4 hidden h-28 w-28 opacity-70 lg:block"
-          style={{
-            backgroundImage:
-              "radial-gradient(var(--rule) 1.6px, transparent 1.6px)",
-            backgroundSize: "15px 15px",
-          }}
-        />
-      </div>
-
-      <ChatHeader error={error} />
+      <ChatHeader error={error} onReset={() => setMessages([])} />
 
       <main
-        className={`mx-auto flex w-full flex-1 flex-col gap-12 px-5 pt-10 pb-8 ${
-          // the 2x2 grid wraps its longest title below this; the transcript instead shares the
-          // composer's width, so question, answer, sources and input all sit on one left edge
-          empty ? "max-w-4xl" : "max-w-2xl"
-        }`}
+        className={`mx-auto flex w-full flex-1 flex-col gap-12 px-5 pt-10 ${
+          empty ? "max-w-4xl pb-8" : "max-w-2xl pb-32"
+          }`}
       >
         {empty && (
           <WelcomeScreen
